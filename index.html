@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แอปวัดพื้นที่และความสูง</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .camera-container {
+            position: relative;
+            width: 100%;
+            /* ใช้สัดส่วนภาพแทนกำหนดความสูงตายตัว เพื่อให้ responsive */
+            aspect-ratio: 16 / 9;
+            background: rgba(0,0,0,0.8);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: 3px solid rgba(255,255,255,0.2);
+        }
+        
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+        
+        .crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 2px solid #00ff88;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(0,255,136,0.5);
+        }
+        
+        .crosshair::before,
+        .crosshair::after {
+            content: '';
+            position: absolute;
+            background: #00ff88;
+            box-shadow: 0 0 10px rgba(0,255,136,0.8);
+        }
+        
+        .crosshair::before {
+            top: 50%;
+            left: -10px;
+            right: -10px;
+            height: 2px;
+            transform: translateY(-50%);
+        }
+        
+        .crosshair::after {
+            left: 50%;
+            top: -10px;
+            bottom: -10px;
+            width: 2px;
+            transform: translateX(-50%);
+        }
+        
+        .measurement-points {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+        
+        .point {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #ff4757;
+            border: 2px solid white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 15px rgba(255,71,87,0.8);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+        }
+        
+        .measurement-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, #ff4757, #00ff88);
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+            transform-origin: left center;
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .input, select {
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            outline: none;
+            width: 100%;
+        }
+        select option { color: #111; }
+        
+        .btn {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #00ff88, #00d4aa);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,255,136,0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(45deg, #ff4757, #ff3742);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255,71,87,0.3);
+        }
+        
+        .btn-info {
+            background: linear-gradient(45deg, #3742fa, #2f3542);
+            color: white;
+            box-shadow: 0 4px 15px rgba(55,66,250,0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .mode-selector {
+            display: flex;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 5px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .mode-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .mode-btn.active {
+            background: rgba(255,255,255,0.2);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .results {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-label {
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        
+        .result-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #00ff88;
+            text-shadow: 0 0 10px rgba(0,255,136,0.3);
+        }
+        
+        .instructions {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border-left: 4px solid #00ff88;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 10px;
+            color: #00ff88;
+        }
+        
+        .instructions ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .instructions li {
+            padding: 5px 0;
+            opacity: 0.9;
+        }
+        
+        .instructions li::before {
+            content: "📱 ";
+            margin-right: 8px;
+        }
+        
+        .camera-status {
+            text-align: center;
+            padding: 20px;
+            color: #ff4757;
+            font-weight: 500;
+        }
+        
+        .measurement-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Ruler overlay */
+        .ruler-overlay {
+            position: absolute;
+            left: 10px;
+            bottom: 10px;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+        .ruler-label { opacity: 0.9; }
+        .ruler-bar {
+            height: 8px;
+            margin-top: 6px;
+            background: repeating-linear-gradient(90deg, #ffffff, #ffffff 1px, transparent 1px, transparent 10px);
+            border: 1px solid #ffffff;
+            border-radius: 3px;
+            width: 120px; /* will be overridden by JS */
+            position: relative;
+        }
+        .ruler-bar::after {
+            content: '';
+            position: absolute;
+            right: -1px;
+            top: -4px;
+            bottom: -4px;
+            width: 2px;
+            background: #ffffff;
+        }
+
+        .tick {
+            position: absolute;
+            bottom: 100%;
+            width: 1px;
+            background: #fff;
+        }
+        .tick.minor { height: 6px; opacity: 0.8; }
+        .tick.major { height: 10px; }
+        .tick-label {
+            position: absolute;
+            bottom: calc(100% + 12px);
+            transform: translateX(-50%);
+            color: #fff;
+            font-size: 11px;
+            white-space: nowrap;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+        }
+
+        /* Small field label for inputs */
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .field-label {
+            font-size: 12px;
+            opacity: 0.85;
+        }
+        /* Hide camera selector for simpler UX */
+        #cameraSelect { display: none; }
+        /* Hide green center crosshair */
+        .crosshair { display: none; }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .camera-container {
+                aspect-ratio: 3 / 4;
+            }
+            
+            .controls {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#764ba2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="วัดระยะ">
+
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📏 แอปวัดพื้นที่และความสูง</h1>
+            <p>ใช้กล้องหลังเพื่อวัดระยะทาง พื้นที่ และความสูง</p>
+        </div>
+        
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="setMode('distance', this)">วัดระยะทาง</button>
+            <button class="mode-btn" onclick="setMode('area', this)">วัดพื้นที่</button>
+            <button class="mode-btn" onclick="setMode('height', this)">วัดความสูง</button>
+        </div>
+        
+        <div class="camera-container">
+            <video id="video" autoplay playsinline webkit-playsinline></video>
+            <div class="camera-overlay">
+                <div class="crosshair"></div>
+                <div class="measurement-points" id="points"></div>
+                <div class="measurement-info" id="info">จุดที่วัด: 0</div>
+                <div class="ruler-overlay" id="rulerOverlay">
+                    <div class="ruler-label" id="rulerLabel">สเกล: 1 ม. ≈ 100 px</div>
+                    <div class="ruler-bar" id="rulerBar"></div>
+                </div>
+            </div>
+            <div class="camera-status" id="camera-status" style="display: none;">
+                กำลังเปิดกล้อง...
+            </div>
+        </div>
+        
+        <div class="controls">
+            <select id="cameraSelect" title="เลือกกล้อง" onchange="onCameraChange(this.value)"></select>
+            <button class="btn btn-info" id="refreshBtn" onclick="refreshCameras()" style="display:none">🔄 รีเฟรชกล้อง</button>
+            <button class="btn btn-primary" onclick="addPoint()">📍 เพิ่มจุด</button>
+            <button class="btn" onclick="undoPoint()">↩️ ย้อนกลับจุด</button>
+            <button class="btn btn-secondary" onclick="clearPoints()">🗑️ ล้างจุด</button>
+            <button class="btn btn-info" onclick="calculate()">📊 คำนวณ</button>
+            <button class="btn btn-info" onclick="toggleCamera()">📷 เปิด/ปิดกล้อง</button>
+            <button class="btn" id="calibBtn" onclick="toggleCalibration()">🎯 คาลิเบรตสเกล</button>
+            <div class="field">
+                <label for="scaleInput" class="field-label">สเกล (พิกเซลต่อ 1 เมตร)</label>
+                <input id="scaleInput" type="number" class="input" min="1" step="1" value="100" title="สเกล (พิกเซลต่อเมตร)" placeholder="เช่น 200 หมายถึง 200px = 1ม.">
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>วิธีใช้งาน:</h3>
+            <ul>
+                <li>เลือกโหมดการวัดที่ต้องการ</li>
+                <li>เล็งกล้องไปที่จุดที่ต้องการวัด</li>
+                <li>แตะบนภาพวิดีโอเพื่อเพิ่มจุด (หรือกดปุ่ม "เพิ่มจุด" เพื่อใช้กึ่งกลางภาพ)</li>
+                <li>เพิ่มจุดตามที่ต้องการ แล้วกด "คำนวณ"</li>
+                <li>ตั้งค่า <b>สเกล</b> เป็นจำนวน <b>พิกเซลต่อ 1 เมตร</b> เพื่อแปลงหน่วยให้เป็นเมตร (ค่าเริ่มต้น 100 px = 1 m)</li>
+            </ul>
+        </div>
+        
+        <div class="results">
+            <div class="result-item">
+                <span class="result-label">ระยะทาง:</span>
+                <span class="result-value" id="distance">0 ม.</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">พื้นที่:</span>
+                <span class="result-value" id="area">0 ตร.ม.</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">ความสูง:</span>
+                <span class="result-value" id="height">0 ม.</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">จำนวนจุด:</span>
+                <span class="result-value" id="point-count">0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'distance';
+        let points = [];
+        let video = document.getElementById('video');
+        let stream = null;
+        let cameraActive = false;
+        let calibrationMode = false;
+        let calibrationPoints = []; // [{x,y} x2]
+        
+        // เริ่มต้นกล้อง
+        async function initCamera(deviceId = null) {
+            const statusElement = document.getElementById('camera-status');
+            
+            // ตรวจสอบว่าเบราว์เซอร์รองรับ getUserMedia หรือไม่
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                statusElement.style.display = 'block';
+                statusElement.textContent = 'เบราว์เซอร์ไม่รองรับการใช้งานกล้อง กรุณาใช้เบราว์เซอร์ที่ทันสมัยกว่านี้';
+                statusElement.style.color = '#ff4757';
+                return;
+            }
+            
+            // แสดงสถานะเริ่มต้น
+            statusElement.style.display = 'block';
+            statusElement.textContent = 'กำลังขอสิทธิ์เข้าถึงกล้อง...';
+            statusElement.style.color = '#00ff88';
+            
+            // ปิด stream เก่าก่อน (ถ้ามี)
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            
+            try {
+                // หากระบุ deviceId ให้ใช้โดยตรง
+                if (deviceId) {
+                    statusElement.textContent = 'กำลังเปิดกล้องที่เลือก...';
+                    stream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            deviceId: { exact: deviceId },
+                            width: { ideal: 1280, min: 640 },
+                            height: { ideal: 720, min: 480 }
+                        }
+                    });
+                } else {
+                    // ลำดับการลองใช้กล้อง: พยายาม environment (ไม่ exact เพื่อรองรับ iOS) -> user -> ใดก็ได้
+                    const cameraConfigs = [
+                        {
+                            name: 'กล้องหลัง',
+                            constraints: {
+                                video: {
+                                    facingMode: { ideal: 'environment' },
+                                    width: { ideal: 1280, min: 640 },
+                                    height: { ideal: 720, min: 480 }
+                                }
+                            }
+                        },
+                        {
+                            name: 'กล้องหน้า',
+                            constraints: {
+                                video: {
+                                    facingMode: { ideal: 'user' },
+                                    width: { ideal: 1280, min: 640 },
+                                    height: { ideal: 720, min: 480 }
+                                }
+                            }
+                        },
+                        {
+                            name: 'กล้องใดก็ได้',
+                            constraints: {
+                                video: {
+                                    width: { ideal: 1280, min: 640 },
+                                    height: { ideal: 720, min: 480 }
+                                }
+                            }
+                        }
+                    ];
+
+                    let cameraOpened = false;
+                    for (const config of cameraConfigs) {
+                        if (cameraOpened) break;
+                        try {
+                            statusElement.textContent = `กำลังเปิด${config.name}...`;
+                            console.log(`กำลังลอง${config.name}...`);
+                            stream = await navigator.mediaDevices.getUserMedia(config.constraints);
+                            if (stream && stream.getVideoTracks().length > 0) {
+                                console.log(`${config.name}เปิดสำเร็จ`);
+                                cameraOpened = true;
+                                break;
+                            }
+                        } catch (configError) {
+                            console.log(`${config.name}ไม่สามารถใช้ได้:`, configError.message);
+                            if (stream) {
+                                stream.getTracks().forEach(track => track.stop());
+                                stream = null;
+                            }
+                        }
+                    }
+                    if (!cameraOpened || !stream) {
+                        throw new Error('ไม่สามารถเปิดกล้องได้');
+                    }
+                }
+                
+                // ตั้งค่า video element
+                statusElement.textContent = 'กำลังโหลดวิดีโอ...';
+                
+                // ล้าง srcObject เก่า
+                if (video.srcObject) {
+                    video.srcObject = null;
+                }
+                
+                // ตั้งค่า video attributes
+                video.muted = true;
+                video.playsInline = true;
+                video.autoplay = true;
+                
+                // ตั้งค่า stream ใหม่
+                video.srcObject = stream;
+                
+                // รอให้ video พร้อม
+                await new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        reject(new Error('Video loading timeout'));
+                    }, 10000); // timeout 10 วินาที
+                    
+                    video.onloadedmetadata = () => {
+                        clearTimeout(timeout);
+                        console.log('Video metadata loaded');
+                        resolve();
+                    };
+                    
+                    video.onerror = (error) => {
+                        clearTimeout(timeout);
+                        console.error('Video error:', error);
+                        reject(error);
+                    };
+                });
+                
+                // เล่น video
+                try {
+                    await video.play();
+                    console.log('Video playing');
+                } catch (playError) {
+                    console.log('Auto-play failed, but video is ready:', playError.message);
+                }
+                
+                // ตั้งค่าสถานะสำเร็จ
+                cameraActive = true;
+                statusElement.style.display = 'none';
+                console.log('กล้องเปิดสำเร็จและพร้อมใช้งาน');
+                // อัปเดตรายการกล้อง
+                try { await populateCameraSelect(); } catch(e) { console.log('populateCameraSelect error', e); }
+                
+            } catch (error) {
+                console.error('ไม่สามารถเข้าถึงกล้องได้:', error);
+                cameraActive = false;
+                statusElement.style.display = 'block';
+                statusElement.style.color = '#ff4757';
+                
+                // ปิด stream ถ้ามี
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null;
+                }
+                
+                // แสดงข้อความแจ้งเตือนตามประเภทของข้อผิดพลาด
+                if (error.name === 'NotAllowedError') {
+                    statusElement.textContent = '❌ ผู้ใช้ปฏิเสธการเข้าถึงกล้อง กรุณาอนุญาตการใช้งานกล้องในเบราว์เซอร์';
+                } else if (error.name === 'NotFoundError') {
+                    statusElement.textContent = '❌ ไม่พบกล้องในอุปกรณ์นี้';
+                } else if (error.name === 'NotReadableError') {
+                    statusElement.textContent = '❌ กล้องถูกใช้งานโดยแอปพลิเคชันอื่น';
+                } else if (error.name === 'OverconstrainedError') {
+                    statusElement.textContent = '❌ การตั้งค่ากล้องไม่รองรับ';
+                } else if (error.name === 'SecurityError') {
+                    statusElement.textContent = '❌ ไม่สามารถเข้าถึงกล้องได้ด้วยเหตุผลด้านความปลอดภัย (ต้องใช้ HTTPS)';
+                } else {
+                    statusElement.textContent = `❌ เกิดข้อผิดพลาด: ${error.message}`;
+                }
+            }
+        }
+        
+        // ทดสอบกล้อง
+        async function testCamera() {
+            const statusElement = document.getElementById('camera-status');
+            statusElement.style.display = 'block';
+            statusElement.style.color = '#00ff88';
+            statusElement.textContent = '🔍 กำลังทดสอบระบบกล้อง...';
+            
+            // ตรวจสอบการรองรับ
+            console.log('=== การทดสอบระบบกล้อง ===');
+            console.log('User Agent:', navigator.userAgent);
+            console.log('Protocol:', location.protocol);
+            console.log('Hostname:', location.hostname);
+            
+            if (!navigator.mediaDevices) {
+                statusElement.textContent = '❌ navigator.mediaDevices ไม่รองรับ';
+                statusElement.style.color = '#ff4757';
+                return;
+            }
+            
+            if (!navigator.mediaDevices.getUserMedia) {
+                statusElement.textContent = '❌ getUserMedia ไม่รองรับ';
+                statusElement.style.color = '#ff4757';
+                return;
+            }
+            
+            // ตรวจสอบอุปกรณ์ที่มี
+            try {
+                statusElement.textContent = '🔍 กำลังตรวจสอบอุปกรณ์ที่มี...';
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                
+                console.log('อุปกรณ์ทั้งหมด:', devices);
+                console.log('อุปกรณ์วิดีโอ:', videoDevices);
+                
+                if (videoDevices.length === 0) {
+                    statusElement.textContent = '❌ ไม่พบกล้องในอุปกรณ์นี้';
+                    statusElement.style.color = '#ff4757';
+                    return;
+                }
+                
+                statusElement.textContent = `✅ พบกล้อง ${videoDevices.length} ตัว - กำลังทดสอบ...`;
+                
+                // ทดสอบเปิดกล้องแบบง่าย
+                const testConstraints = { video: true };
+                const testStream = await navigator.mediaDevices.getUserMedia(testConstraints);
+                
+                if (testStream) {
+                    statusElement.textContent = '✅ ทดสอบสำเร็จ! กล้องทำงานได้ปกติ';
+                    statusElement.style.color = '#00ff88';
+                    
+                    // ปิด test stream
+                    testStream.getTracks().forEach(track => track.stop());
+                    
+                    // เปิดกล้องจริง
+                    setTimeout(() => {
+                        initCamera();
+                    }, 1000);
+                } else {
+                    statusElement.textContent = '❌ ไม่สามารถเปิดกล้องได้';
+                    statusElement.style.color = '#ff4757';
+                }
+                
+            } catch (error) {
+                console.error('การทดสอบล้มเหลว:', error);
+                statusElement.style.color = '#ff4757';
+                
+                if (error.name === 'NotAllowedError') {
+                    statusElement.textContent = '❌ ผู้ใช้ปฏิเสธการเข้าถึงกล้อง';
+                } else if (error.name === 'NotFoundError') {
+                    statusElement.textContent = '❌ ไม่พบกล้อง';
+                } else if (error.name === 'SecurityError') {
+                    statusElement.textContent = '❌ ปัญหาความปลอดภัย (ต้องใช้ HTTPS)';
+                } else {
+                    statusElement.textContent = `❌ ข้อผิดพลาด: ${error.message}`;
+                }
+            }
+        }
+        
+        // เปิด/ปิดกล้อง
+        function toggleCamera() {
+            const statusElement = document.getElementById('camera-status');
+            
+            if (cameraActive) {
+                // ปิดกล้อง
+                if (stream) {
+                    stream.getTracks().forEach(track => {
+                        track.stop();
+                        console.log('ปิดกล้องแล้ว');
+                    });
+                    video.srcObject = null;
+                    stream = null;
+                }
+                cameraActive = false;
+                statusElement.style.display = 'block';
+                statusElement.textContent = '📷 กล้องปิดอยู่ - กดปุ่มเพื่อเปิดกล้อง';
+                statusElement.style.color = '#ff4757';
+            } else {
+                // เปิดกล้อง
+                initCamera();
+            }
+        }
+        
+        // ตั้งค่าโหมด
+        function setMode(mode, btn) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            if (btn) {
+                btn.classList.add('active');
+            }
+            clearPoints();
+            
+            // อัพเดทคำแนะนำตามโหมด
+            const instructions = document.querySelector('.instructions ul');
+            switch(mode) {
+                case 'distance':
+                    instructions.innerHTML = `
+                        <li>เลือกจุดเริ่มต้นและจุดสิ้นสุด</li>
+                        <li>กดปุ่ม "เพิ่มจุด" ที่จุดทั้งสอง</li>
+                        <li>กด "คำนวณ" เพื่อดูระยะทาง</li>
+                    `;
+                    break;
+                case 'area':
+                    instructions.innerHTML = `
+                        <li>เพิ่มจุดรอบๆ พื้นที่ที่ต้องการวัด</li>
+                        <li>ต้องมีอย่างน้อย 3 จุดขึ้นไป</li>
+                        <li>กด "คำนวณ" เพื่อดูพื้นที่</li>
+                    `;
+                    break;
+                case 'height':
+                    instructions.innerHTML = `
+                        <li>เลือกจุดฐานและจุดยอด</li>
+                        <li>ถือโทรศัพท์ในแนวตั้ง</li>
+                        <li>กด "คำนวณ" เพื่อดูความสูง</li>
+                    `;
+                    break;
+            }
+        }
+        
+        // เพิ่มจุดวัด
+        function addPoint(x = null, y = null) {
+            if (!cameraActive) {
+                alert('กรุณาเปิดกล้องก่อนใช้งาน');
+                return;
+            }
+            
+            const container = document.querySelector('.camera-container');
+            const rect = container.getBoundingClientRect();
+            
+            // หากไม่ระบุตำแหน่ง ให้ใช้กึ่งกลางของกล้อง
+            if (x === null || y === null) {
+                x = rect.width / 2;
+                y = rect.height / 2;
+            }
+
+            // ถ้าคลิกนอกเฟรม ให้ออก
+            if (x < 0 || y < 0 || x > rect.width || y > rect.height) return;
+
+            // จำกัดจำนวนจุดตามโหมด
+            if (currentMode === 'height' && points.length >= 2) {
+                alert('โหมดความสูงใช้ได้ 2 จุด (ฐานและยอด)');
+                return;
+            }
+            if (currentMode === 'distance' && points.length >= 2) {
+                alert('โหมดระยะทางใช้ตัวอย่าง 2 จุด (เริ่มต้น-สิ้นสุด)');
+                return;
+            }
+            
+            // สร้างจุดใหม่
+            const point = {
+                id: points.length,
+                x: x,
+                y: y
+            };
+            
+            points.push(point);
+            
+            // แสดงจุดบนหน้าจอ
+            const pointElement = document.createElement('div');
+            pointElement.className = 'point';
+            pointElement.style.left = x + 'px';
+            pointElement.style.top = y + 'px';
+            pointElement.title = `จุดที่ ${point.id + 1}`;
+            
+            document.getElementById('points').appendChild(pointElement);
+            
+            // อัพเดทข้อมูล
+            updateInfo();
+            drawLines();
+        }
+        
+        // ล้างจุดทั้งหมด
+        function clearPoints() {
+            points = [];
+            document.getElementById('points').innerHTML = '';
+            updateInfo();
+            updateResults();
+        }
+
+        // ย้อนกลับจุดล่าสุด
+        function undoPoint() {
+            if (points.length === 0) return;
+            points.pop();
+            const pts = document.getElementById('points');
+            if (pts.lastChild) pts.removeChild(pts.lastChild);
+            updateInfo();
+            drawLines();
+        }
+        
+        // วาดเส้นเชื่อมจุด
+        function drawLines() {
+            // ลบเส้นเก่า
+            document.querySelectorAll('.measurement-line').forEach(line => line.remove());
+            
+            if (points.length < 2) return;
+            
+            const container = document.getElementById('points');
+            
+            for (let i = 0; i < points.length - 1; i++) {
+                const p1 = points[i];
+                const p2 = points[i + 1];
+                
+                const line = document.createElement('div');
+                line.className = 'measurement-line';
+                
+                const dx = p2.x - p1.x;
+                const dy = p2.y - p1.y;
+                const length = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                
+                line.style.left = p1.x + 'px';
+                line.style.top = p1.y + 'px';
+                line.style.width = length + 'px';
+                line.style.transform = `rotate(${angle}deg)`;
+                
+                container.appendChild(line);
+            }
+            
+            // เชื่อมจุดสุดท้ายกับจุดแรกสำหรับโหมดพื้นที่
+            if (currentMode === 'area' && points.length > 2) {
+                const p1 = points[points.length - 1];
+                const p2 = points[0];
+                
+                const line = document.createElement('div');
+                line.className = 'measurement-line';
+                
+                const dx = p2.x - p1.x;
+                const dy = p2.y - p1.y;
+                const length = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                
+                line.style.left = p1.x + 'px';
+                line.style.top = p1.y + 'px';
+                line.style.width = length + 'px';
+                line.style.transform = `rotate(${angle}deg)`;
+                
+                container.appendChild(line);
+            }
+        }
+        
+        // คำนวณผลลัพธ์
+        function calculate() {
+            if (points.length === 0) {
+                alert('กรุณาเพิ่มจุดวัดก่อน');
+                return;
+            }
+            
+            let distance = 0;
+            let area = 0;
+            let height = 0;
+            
+            switch (currentMode) {
+                case 'distance':
+                    if (points.length >= 2) {
+                        distance = calculateDistance();
+                    }
+                    break;
+                    
+                case 'area':
+                    if (points.length >= 3) {
+                        area = calculateArea();
+                    } else {
+                        alert('ต้องมีอย่างน้อย 3 จุดสำหรับการวัดพื้นที่');
+                        return;
+                    }
+                    break;
+                    
+                case 'height':
+                    if (points.length >= 2) {
+                        height = calculateHeight();
+                    }
+                    break;
+            }
+            
+            updateResults(distance, area, height);
+        }
+        
+        // คำนวณระยะทาง
+        function getScalePxPerMeter() {
+            const v = parseFloat(document.getElementById('scaleInput')?.value || '100');
+            return isNaN(v) || v <= 0 ? 100 : v;
+        }
+
+        function calculateDistance() {
+            let totalDistance = 0;
+            const s = getScalePxPerMeter();
+            
+            for (let i = 0; i < points.length - 1; i++) {
+                const p1 = points[i];
+                const p2 = points[i + 1];
+                
+                const dx = p2.x - p1.x;
+                const dy = p2.y - p1.y;
+                const distance = Math.sqrt(dx * dx + dy * dy) / s; // เมตร
+                totalDistance += distance;
+            }
+            
+            return totalDistance;
+        }
+        
+        // คำนวณพื้นที่
+        function calculateArea() {
+            if (points.length < 3) return 0;
+            
+            // ใช้ Shoelace formula
+            let area = 0;
+            const n = points.length;
+            
+            for (let i = 0; i < n; i++) {
+                const j = (i + 1) % n;
+                area += points[i].x * points[j].y;
+                area -= points[j].x * points[i].y;
+            }
+            const s = getScalePxPerMeter();
+            return Math.abs(area) / 2 / (s * s); // ตร.ม.
+        }
+        
+        // คำนวณความสูง
+        function calculateHeight() {
+            if (points.length < 2) return 0;
+            
+            const p1 = points[0];
+            const p2 = points[points.length - 1];
+            
+            // ใช้ความต่างแนวตั้งของพิกเซลเป็นค่าประมาณความสูง (แปลงเป็นเมตรด้วยสเกล)
+            const s = getScalePxPerMeter();
+            return Math.abs(p2.y - p1.y) / s;
+        }
+        
+        // อัพเดทข้อมูลการวัด
+        function updateInfo() {
+            document.getElementById('info').textContent = `จุดที่วัด: ${points.length}`;
+            document.getElementById('point-count').textContent = points.length;
+        }
+        
+        // อัพเดทผลลัพธ์
+        function updateResults(distance = 0, area = 0, height = 0) {
+            document.getElementById('distance').textContent = distance.toFixed(2) + ' ม.';
+            document.getElementById('area').textContent = area.toFixed(2) + ' ตร.ม.';
+            document.getElementById('height').textContent = height.toFixed(2) + ' ม.';
+        }
+        
+        // ตรวจสอบสถานะกล้องเป็นระยะ
+        function checkCameraStatus() {
+            if (stream) {
+                const videoTrack = stream.getVideoTracks()[0];
+                if (videoTrack && videoTrack.readyState === 'ended') {
+                    console.log('กล้องถูกปิดจากภายนอก');
+                    cameraActive = false;
+                    const statusElement = document.getElementById('camera-status');
+                    statusElement.style.display = 'block';
+                    statusElement.textContent = '📷 กล้องถูกปิด - กดปุ่มเพื่อเปิดกล้องใหม่';
+                    statusElement.style.color = '#ff4757';
+                }
+            }
+        }
+        
+        // รองรับแตะที่หน้าวิดีโอเพื่อเพิ่มจุดตามตำแหน่ง
+        (function setupTapToAdd() {
+            const container = document.querySelector('.camera-container');
+            let lastAddTs = 0;
+            function addPointFromEvent(e) {
+                if (!cameraActive) return;
+                const now = Date.now();
+                if (now - lastAddTs < 250) return; // debounce 250ms
+                const rect = container.getBoundingClientRect();
+                let clientX, clientY;
+                if (e.touches && e.touches.length) {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                } else {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                }
+                const x = clientX - rect.left;
+                const y = clientY - rect.top;
+                if (calibrationMode) {
+                    handleCalibrationTap(x, y);
+                } else {
+                    addPoint(x, y);
+                }
+                lastAddTs = now;
+            }
+            container.addEventListener('click', addPointFromEvent);
+            container.addEventListener('touchstart', function(e){ addPointFromEvent(e); }, { passive: true });
+        })();
+
+        // โหมดคาลิเบรต: แตะ 2 จุดบนวิดีโอ แล้วกรอกความยาวจริง (เมตร) เพื่อคำนวณสเกล px/ม.
+        function toggleCalibration() {
+            calibrationMode = !calibrationMode;
+            const btn = document.getElementById('calibBtn');
+            const statusElement = document.getElementById('camera-status');
+            if (calibrationMode) {
+                calibrationPoints = [];
+                removeCalibrationMarkers();
+                btn.textContent = '✅ กำลังคาลิเบรต... (แตะ 2 จุด)';
+                statusElement.style.display = 'block';
+                statusElement.textContent = '🎯 โหมดคาลิเบรต: แตะ 2 จุดบนวิดีโอเพื่อเลือกความยาวอ้างอิง';
+                statusElement.style.color = '#2ed573';
+            } else {
+                btn.textContent = '🎯 คาลิเบรตสเกล';
+                statusElement.style.display = 'block';
+                statusElement.textContent = '📷 กล้องปิดอยู่ - กดปุ่มเพื่อเปิดกล้อง';
+                statusElement.style.color = '#ffeb3b';
+                removeCalibrationMarkers();
+            }
+        }
+
+        function handleCalibrationTap(x, y) {
+            const container = document.querySelector('.camera-container');
+            const rect = container.getBoundingClientRect();
+            if (x < 0 || y < 0 || x > rect.width || y > rect.height) return;
+
+            // วาด marker ชั่วคราว
+            const marker = document.createElement('div');
+            marker.className = 'calib-point';
+            marker.style.position = 'absolute';
+            marker.style.width = '10px';
+            marker.style.height = '10px';
+            marker.style.borderRadius = '50%';
+            marker.style.background = '#2ed573';
+            marker.style.border = '2px solid #145a32';
+            marker.style.left = (x - 5) + 'px';
+            marker.style.top = (y - 5) + 'px';
+            document.getElementById('points').appendChild(marker);
+
+            calibrationPoints.push({ x, y });
+            if (calibrationPoints.length === 2) {
+                const [p1, p2] = calibrationPoints;
+                const pixelDist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+                const realMetersStr = prompt(`ระยะพิกเซล ≈ ${pixelDist.toFixed(2)} px\nกรอกความยาวจริง (เมตร):`, '1');
+                const realMeters = parseFloat(realMetersStr);
+                if (!isNaN(realMeters) && realMeters > 0) {
+                    const scale = pixelDist / realMeters; // px ต่อ 1 เมตร
+                    const scaleInput = document.getElementById('scaleInput');
+                    scaleInput.value = Math.max(1, Math.round(scale));
+                    try { localStorage.setItem('scalePxPerMeter', scaleInput.value); } catch {}
+                    updateRuler();
+                    alert(`ตั้งสเกลใหม่เป็น ~ ${scaleInput.value} px/ม.`);
+                } else {
+                    alert('ค่าไม่ถูกต้อง ยกเลิกการคาลิเบรต');
+                }
+                // ออกจากโหมดคาลิเบรตและล้าง marker
+                calibrationMode = false;
+                const btn = document.getElementById('calibBtn');
+                btn.textContent = '🎯 คาลิเบรตสเกล';
+                removeCalibrationMarkers();
+            }
+        }
+
+        function removeCalibrationMarkers() {
+            calibrationPoints = [];
+            document.querySelectorAll('.calib-point').forEach(el => el.remove());
+        }
+
+        // อัปเดตสเกลไม้บรรทัดบนหน้ากล้อง
+        function updateRuler() {
+            const bar = document.getElementById('rulerBar');
+            const label = document.getElementById('rulerLabel');
+            const container = document.querySelector('.camera-container');
+            if (!bar || !label || !container) return;
+            const rect = container.getBoundingClientRect();
+            const scaleInput = document.getElementById('scaleInput');
+            const pxPerMeter = Math.max(1, parseFloat(scaleInput.value) || 100);
+
+            // ความกว้างสูงสุดของแถบ และความกว้างที่ใช้จริง (พยายามให้ยาว = 1 เมตร หากพื้นที่พอ)
+            const maxBar = Math.max(80, Math.min(rect.width - 40, 240));
+            const targetWidth = pxPerMeter; // 1 เมตร
+            const barWidth = Math.round(Math.max(80, Math.min(targetWidth, maxBar)));
+            bar.style.width = barWidth + 'px';
+            label.textContent = `สเกล: 1 ม. ≈ ${pxPerMeter} px` + (barWidth < pxPerMeter ? ' (แสดงย่อ)' : '');
+
+            // ลบ tick เดิม
+            bar.querySelectorAll('.tick, .tick-label').forEach(el => el.remove());
+
+            // วาด tick ตามสเกลที่มีพื้นที่พอ
+            const maxMetersShown = barWidth / pxPerMeter; // เมตรที่มองเห็นบนแถบ
+            // เลือก step ย่อย
+            let minorStep = 0.5; // เริ่มจาก 0.5 ม.
+            if (pxPerMeter * 0.5 < 40) {
+                // ถ้า 0.5 เมตรแคบเกินไป ให้ใช้เฉพาะหลัก 1 เมตร
+                minorStep = 1;
+            } else if (pxPerMeter * 0.25 >= 40 && maxMetersShown >= 1) {
+                // ถ้าพอพื้นที่ แสดง 0.25 ด้วย
+                minorStep = 0.25;
+            }
+
+            // วาด tick ที่ 0 ม.
+            const tick0 = document.createElement('div');
+            tick0.className = 'tick major';
+            tick0.style.left = '0px';
+            bar.appendChild(tick0);
+            const lbl0 = document.createElement('div');
+            lbl0.className = 'tick-label';
+            lbl0.style.left = '0px';
+            lbl0.textContent = '0 ม.';
+            bar.appendChild(lbl0);
+
+            // วาดจาก 0 ถึงความยาวที่แสดงได้
+            const endMeters = Math.max(minorStep, Math.min(1, maxMetersShown));
+            for (let m = minorStep; m <= endMeters + 1e-6; m += minorStep) {
+                const x = Math.round(m * pxPerMeter);
+                if (x > barWidth) break;
+                const isMajor = Math.abs(m - Math.round(m)) < 1e-6; // ระยะเต็มเมตร
+                const isHalf = Math.abs(m - 0.5) < 1e-6; // 0.5 เมตรแรก
+
+                const tick = document.createElement('div');
+                tick.className = 'tick ' + (isMajor ? 'major' : 'minor');
+                tick.style.left = x + 'px';
+                bar.appendChild(tick);
+
+                // แสดง label ที่ 0.5 ม. และทุกๆ 1 ม.
+                if (isMajor || isHalf) {
+                    const lbl = document.createElement('div');
+                    lbl.className = 'tick-label';
+                    lbl.style.left = x + 'px';
+                    lbl.textContent = (isHalf ? '0.5 ม.' : `${Math.round(m)} ม.`);
+                    bar.appendChild(lbl);
+                }
+            }
+        }
+
+        // เริ่มต้นแอป (ไม่เปิดกล้องอัตโนมัติ เพื่อหลีกเลี่ยง autoplay block บางเคส)
+        window.addEventListener('load', () => {
+            console.log('เริ่มต้นแอปวัดพื้นที่และความสูง');
+            const statusElement = document.getElementById('camera-status');
+            statusElement.style.display = 'block';
+            statusElement.textContent = '📷 กล้องปิดอยู่ - กดปุ่มเพื่อเปิดกล้อง';
+            statusElement.style.color = '#ffeb3b';
+            // ตรวจสอบสถานะกล้องทุก 2 วินาที
+            setInterval(checkCameraStatus, 2000);
+            // ลงทะเบียน Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js').then(() => {
+                    console.log('Service Worker registered');
+                }).catch(err => console.log('SW registration failed', err));
+            }
+
+            // Restore/Save scale from localStorage
+            const scaleInput = document.getElementById('scaleInput');
+            try {
+                const saved = localStorage.getItem('scalePxPerMeter');
+                if (saved) scaleInput.value = saved;
+            } catch {}
+            updateRuler();
+            scaleInput.addEventListener('input', () => {
+                try { localStorage.setItem('scalePxPerMeter', scaleInput.value); } catch {}
+                updateRuler();
+            });
+            window.addEventListener('resize', () => {
+                updateRuler();
+            });
+        });
+        
+        // จัดการเมื่อปิดหน้าเว็บ
+        window.addEventListener('beforeunload', () => {
+            if (stream) {
+                stream.getTracks().forEach(track => {
+                    track.stop();
+                    console.log('ปิดกล้องเมื่อออกจากหน้าเว็บ');
+                });
+            }
+        });
+        
+        // จัดการเมื่อหน้าเว็บถูกซ่อน/แสดง
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                console.log('หน้าเว็บถูกซ่อน');
+            } else {
+                console.log('หน้าเว็บถูกแสดง');
+                // ตรวจสอบสถานะกล้องเมื่อกลับมาที่หน้าเว็บ
+                checkCameraStatus();
+            }
+        });
+    </script>
+</body>
+</html>
