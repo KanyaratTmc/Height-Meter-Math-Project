@@ -293,6 +293,25 @@
             content: "📱 ";
             margin-right: 8px;
         }
+        /* Trig lesson panel */
+        .lesson {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .lesson h3 { color: #ffd166; margin-bottom: 10px; }
+        .lesson pre {
+            background: rgba(0,0,0,0.35);
+            border-radius: 8px;
+            padding: 12px;
+            overflow: auto;
+            line-height: 1.5;
+            font-size: 13px;
+            white-space: pre-wrap;
+        }
+        .lesson .note { opacity: 0.9; font-size: 13px; margin-top: 8px; }
         
         .camera-status {
             text-align: center;
@@ -440,6 +459,11 @@
                 <label for="scaleInput" class="field-label">สเกล (พิกเซลต่อ 1 เมตร)</label>
                 <input id="scaleInput" type="number" class="input" min="1" step="1" value="100" title="สเกล (พิกเซลต่อเมตร)" placeholder="เช่น 200 หมายถึง 200px = 1ม.">
             </div>
+            <div class="field" id="baselineField" style="display:none">
+                <label for="baselineInput" class="field-label">ระยะฐาน D จากกล้องถึงจุดฐาน (เมตร)</label>
+                <input id="baselineInput" type="number" class="input" min="0" step="0.1" placeholder="เช่น 5.0">
+            </div>
+            <button class="btn" id="trigBtn" onclick="toggleTrigPanel()">📘 บทเรียนตรีโกณมิติ</button>
         </div>
         
         <div class="instructions">
@@ -469,6 +493,12 @@
             <div class="result-item">
                 <span class="result-label">จำนวนจุด:</span>
                 <span class="result-value" id="point-count">0</span>
+            </div>
+        </div>
+        <div id="trigPanel" class="lesson" style="display:none">
+            <h3>📘 บทเรียนฟังก์ชันตรีโกณมิติ</h3>
+            <div id="trigContent">
+                เลือกโหมดและเพิ่มจุด แล้วกด “คำนวณ” เพื่อดูขั้นตอนอธิบายการคำนวณด้วยตรีโกณมิติที่นี่
             </div>
         </div>
     </div>
@@ -766,6 +796,10 @@
             clearPoints();
             
             // อัพเดทคำแนะนำตามโหมด
+            const baselineField = document.getElementById('baselineField');
+            if (baselineField) {
+                baselineField.style.display = (mode === 'height') ? 'block' : 'none';
+            }
             const instructions = document.querySelector('.instructions ul');
             switch(mode) {
                 case 'distance':
@@ -928,12 +962,14 @@
                 case 'distance':
                     if (points.length >= 2) {
                         distance = calculateDistance();
+                        try { renderTrigLessonDistance(); } catch(e) { console.log('trig distance render error', e); }
                     }
                     break;
                     
                 case 'area':
                     if (points.length >= 3) {
                         area = calculateArea();
+                        try { renderTrigLessonArea(); } catch(e) { console.log('trig area render error', e); }
                     } else {
                         alert('ต้องมีอย่างน้อย 3 จุดสำหรับการวัดพื้นที่');
                         return;
@@ -942,7 +978,20 @@
                     
                 case 'height':
                     if (points.length >= 2) {
-                        height = calculateHeight();
+                        const D = parseFloat(document.getElementById('baselineInput')?.value || '');
+                        if (!isNaN(D) && D > 0) {
+                            const p1 = points[0];
+                            const p2 = points[points.length - 1];
+                            const dx = (p2.x - p1.x);
+                            const dy = (p2.y - p1.y);
+                            const thetaRad = Math.atan2(-dy, dx); // -dy เพราะแกน y จอภาพลงล่าง
+                            const hTrig = D * Math.tan(thetaRad);
+                            height = Math.abs(hTrig);
+                            try { renderTrigLessonHeight(D, thetaRad, dx, dy, getScalePxPerMeter(), height); } catch(e) { console.log('trig height render error', e); }
+                        } else {
+                            height = calculateHeight();
+                            try { renderTrigLessonHeightPixel(); } catch(e) { console.log('trig height (pixel) render error', e); }
+                        }
                     }
                     break;
             }
@@ -1013,6 +1062,98 @@
             document.getElementById('distance').textContent = distance.toFixed(2) + ' ม.';
             document.getElementById('area').textContent = area.toFixed(2) + ' ตร.ม.';
             document.getElementById('height').textContent = height.toFixed(2) + ' ม.';
+        }
+        
+        // Trig lesson helpers
+        function toggleTrigPanel() {
+            const panel = document.getElementById('trigPanel');
+            if (!panel) return;
+            panel.style.display = (panel.style.display === 'none' || panel.style.display === '') ? 'block' : 'none';
+        }
+
+        function setTrigContent(html) {
+            const el = document.getElementById('trigContent');
+            if (!el) return;
+            el.innerHTML = html;
+        }
+
+        function renderTrigLessonDistance() {
+            if (points.length < 2) return;
+            const s = getScalePxPerMeter();
+            const p1 = points[0];
+            const p2 = points[points.length - 1];
+            const dx = p2.x - p1.x;
+            const dy = p2.y - p1.y;
+            const px = Math.hypot(dx, dy);
+            const m = px / s;
+            const thetaDeg = (Math.atan2(-dy, dx) * 180 / Math.PI);
+            setTrigContent(`
+                <pre>
+ขั้นตอนคำนวณระยะทาง
+1) ความต่างพิกัด: Δx = ${dx.toFixed(2)}, Δy = ${dy.toFixed(2)} (พิกเซล)
+2) ระยะพิกเซล: √(Δx²+Δy²) = ${px.toFixed(2)} px
+3) สเกล: ${s} px ต่อ 1 m
+4) ระยะจริง: ${px.toFixed(2)} / ${s} = ${m.toFixed(2)} m
+5) มุมเส้น: θ = atan2(−Δy, Δx) ≈ ${thetaDeg.toFixed(1)}°
+                </pre>
+                <div class="note">หมายเหตุ: ระยะเป็นผลรวมของเส้นตรงระหว่างจุดแรกกับจุดสุดท้ายที่เลือก</div>
+            `);
+        }
+
+        function renderTrigLessonArea() {
+            if (points.length < 3) return;
+            const s = getScalePxPerMeter();
+            // Shoelace
+            let sum = 0;
+            for (let i = 0; i < points.length; i++) {
+                const j = (i + 1) % points.length;
+                sum += points[i].x * points[j].y - points[j].x * points[i].y;
+            }
+            const px2 = Math.abs(sum) / 2;
+            const m2 = px2 / (s * s);
+            const coords = points.map((p, i) => `P${i+1}(${p.x.toFixed(1)}, ${p.y.toFixed(1)})`).join(', ');
+            setTrigContent(`
+                <pre>
+ขั้นตอนคำนวณพื้นที่ (Shoelace)
+จุด: ${coords}
+1) พิกเซลพื้นที่: |Σ(x_i y_{i+1} − x_{i+1} y_i)| / 2 = ${px2.toFixed(2)} px²
+2) สเกล: ${s} px ต่อ 1 m → 1 m² = ${s*s} px²
+3) พื้นที่จริง: ${px2.toFixed(2)} / (${s}²) = ${m2.toFixed(2)} m²
+                </pre>
+                <div class="note">หมายเหตุ: พื้นที่แม่นยำขึ้นเมื่อเลือกจุดล้อมรูปครบและเป็นลำดับทวน/ตามเข็มต่อเนื่อง</div>
+            `);
+        }
+
+        function renderTrigLessonHeight(D, thetaRad, dx, dy, s, h) {
+            const thetaDeg = thetaRad * 180 / Math.PI;
+            setTrigContent(`
+                <pre>
+ขั้นตอนคำนวณความสูงด้วยตรีโกณมิติ (มีฐาน D)
+1) ฐาน D = ${D.toFixed(2)} m
+2) คำนวณมุมเงย: θ = atan2(−Δy, Δx) = ${thetaDeg.toFixed(1)}°  (Δx=${dx.toFixed(2)}, Δy=${dy.toFixed(2)} px)
+3) สูตร: h = D · tan(θ)
+4) h = ${D.toFixed(2)} · tan(${thetaDeg.toFixed(1)}°) = ${h.toFixed(2)} m
+                </pre>
+                <div class="note">หมายเหตุ: ต้องรู้ระยะฐานระหว่างกล้องถึงจุดฐานวัตถุ และเล็งเส้นจากฐานไปยอดให้ถูกทิศ</div>
+            `);
+        }
+
+        function renderTrigLessonHeightPixel() {
+            if (points.length < 2) return;
+            const s = getScalePxPerMeter();
+            const p1 = points[0];
+            const p2 = points[points.length - 1];
+            const dypx = Math.abs(p2.y - p1.y);
+            const m = dypx / s;
+            setTrigContent(`
+                <pre>
+ขั้นตอนคำนวณความสูงโดยอิงพิกเซลแนวตั้ง (ประมาณการ)
+1) ความต่างแนวตั้ง: |Δy| = ${dypx.toFixed(2)} px
+2) สเกล: ${s} px ต่อ 1 m
+3) ความสูงประมาณ: ${dypx.toFixed(2)} / ${s} = ${m.toFixed(2)} m
+                </pre>
+                <div class="note">หมายเหตุ: วิธีนี้เป็นการประมาณจากพิกเซล ไม่ได้คำนึงถึงมุมมอง/ระยะจริง เหมาะใช้คร่าวๆ เท่านั้น</div>
+            `);
         }
         
         // ตรวจสอบสถานะกล้องเป็นระยะ
