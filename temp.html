@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แอปวัดความสูงอย่างง่าย</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        /* Mode Selector Styles */
+        .mode-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+        
+        .mode-btn {
+            padding: 12px 20px;
+            background-color: rgba(255, 255, 255, 0.15);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 140px;
+            max-width: 180px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .mode-btn:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+        
+        .mode-btn.active {
+            background: linear-gradient(135deg, rgba(0,255,136,0.5), rgba(0,212,170,0.5));
+            box-shadow: 0 4px 15px rgba(0,255,136,0.3);
+        }
+        
+        /* Controls Section */
+        .controls {
+            margin: 30px 0;
+        }
+        
+        .control-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #00ff88;
+        }
+        
+        .control-section h3 {
+            color: #00ff88;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #00ff88, #00d4aa);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,255,136,0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #00d4aa, #00ff88);
+            box-shadow: 0 6px 20px rgba(0,255,136,0.4);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #ff4757, #ff3742);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255,71,87,0.3);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #ff3742, #ff4757);
+            box-shadow: 0 6px 20px rgba(255,71,87,0.4);
+            transform: translateY(-2px);
+        }
+        
+        .btn-info {
+            background: linear-gradient(135deg, #3742fa, #2f3542);
+            color: white;
+            box-shadow: 0 4px 15px rgba(55,66,250,0.3);
+        }
+
+        .btn-info:hover {
+            background: linear-gradient(135deg, #2f3542, #3742fa);
+            box-shadow: 0 6px 20px rgba(55,66,250,0.4);
+            transform: translateY(-2px);
+        }
+        
+        /* Field Styles */
+        .field {
+            margin-bottom: 15px;
+        }
+
+        .field:last-child {
+            margin-bottom: 0;
+        }
+
+        .field-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.9);
+            font-size: 14px;
+        }
+
+        .input, select {
+            padding: 12px 15px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            outline: none;
+            width: 100%;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .input:focus, select:focus {
+            background: rgba(255,255,255,0.25);
+            border: 1px solid rgba(0,255,136,0.5);
+            box-shadow: 0 0 15px rgba(0,255,136,0.2);
+        }
+
+        .input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+        
+        select option { 
+            color: #111; 
+            background: #fff;
+            padding: 10px;
+        }
+        
+        /* Camera Container */
+        .camera-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: rgba(0,0,0,0.8);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: 3px solid rgba(255,255,255,0.2);
+        }
+        
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+        
+        .measurement-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Results Section */
+        .results {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .result-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .result-label {
+            font-weight: 500;
+            opacity: 0.9;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .result-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #00ff88;
+            text-shadow: 0 0 10px rgba(0,255,136,0.3);
+        }
+        
+        /* Instructions */
+        .instructions {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border-left: 4px solid #00ff88;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 15px;
+            color: #00ff88;
+        }
+        
+        .instructions ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .instructions li {
+            padding: 8px 0;
+            opacity: 0.9;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .instructions li:last-child {
+            border-bottom: none;
+        }
+        
+        .instructions li::before {
+            content: "📱 ";
+            margin-right: 8px;
+        }
+
+        /* Math formulas section */
+        .math-formulas {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .math-formulas h3 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .formula-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .formula-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .formula-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .formula-title {
+            color: #ffd93d;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .formula-equation {
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            color: #6bcf7f;
+            margin-bottom: 5px;
+        }
+
+        .formula-desc {
+            font-size: 12px;
+            opacity: 0.8;
+            color: #e1e1e1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .mode-btn {
+                min-width: 120px;
+                padding: 10px 15px;
+                font-size: 13px;
+            }
+            
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn {
+                min-width: 100px;
+                padding: 10px 15px;
+                font-size: 13px;
+            }
+            
+            .result-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .formula-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .mode-btn {
+                min-width: 100px;
+                max-width: 100%;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📏 แอปวัดความสูงอย่างง่าย</h1>
+            <p>ใช้กล้องหลังเพื่อวัดความยาว พื้นที่ และความสูง</p>
+        </div>
+        
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="setMode('distance', this)">วัดความยาว</button>
+            <button class="mode-btn" onclick="setMode('area', this)">วัดพื้นที่</button>
+            <button class="mode-btn" onclick="setMode('height', this)">วัดความสูง</button>
+            <button class="mode-btn" onclick="setMode('angle', this)">วัดมุม</button>
+        </div>
+        
+        <!-- Math Formulas Section -->
+        <div class="math-formulas">
+            <h3>🧮 สูตรฟังก์ชันตรีโกณมิติที่ใช้ในโปรเจค</h3>
+            <div class="formula-grid">
+                <div class="formula-item">
+                    <div class="formula-title">ฟังก์ชัน Sine</div>
+                    <div class="formula-equation">sin θ = ตรงข้าม / ด้านเอียง</div>
+                    <div class="formula-desc">ใช้หาความสูงจากมุมและระยะ</div>
+                </div>
+                <div class="formula-item">
+                    <div class="formula-title">ฟังก์ชัน Cosine</div>
+                    <div class="formula-equation">cos θ = ประชิด / ด้านเอียง</div>
+                    <div class="formula-desc">ใช้หาระยะแนวนอนจากมุม</div>
+                </div>
+                <div class="formula-item">
+                    <div class="formula-title">ฟังก์ชัน Tangent</div>
+                    <div class="formula-equation">tan θ = ตรงข้าม / ประชิด</div>
+                    <div class="formula-desc">ใช้หามุมจากอัตราส่วนด้าน</div>
+                </div>
+                <div class="formula-item">
+                    <div class="formula-title">ทฤษฎีบทพีทาโกรัส</div>
+                    <div class="formula-equation">c² = a² + b²</div>
+                    <div class="formula-desc">หาความยาวตรงจาก 2 จุด</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="camera-container">
+            <video id="video" autoplay playsinline webkit-playsinline></video>
+            <div class="camera-overlay">
+                <div class="measurement-points" id="points"></div>
+                <div class="measurement-info" id="info">จุดที่วัด: 0</div>
+            </div>
+            <div class="camera-status" id="camera-status" style="display: none;">
+                กำลังเปิดกล้อง...
+            </div>
+        </div>
+        
+        <div class="controls">
+            <!-- Common Controls -->
+            <div class="control-section">
+                <h3>🔄 การควบคุมทั่วไป</h3>
+                <div class="btn-group">
+                    <button class="btn btn-info" onclick="calculate()">📊 คำนวณ</button>
+                    <button class="btn" onclick="undoPoint()">↩️ ย้อนกลับจุด</button>
+                    <button class="btn btn-secondary" onclick="clearPoints()">🗑️ ล้างจุด</button>
+                    <button class="btn btn-info" onclick="toggleCamera()">📷 เปิด/ปิดกล้อง</button>
+                </div>
+            </div>
+            
+            <!-- Camera Controls -->
+            <div class="control-section" id="cameraControls">
+                <h3>🎥 การตั้งค่ากล้อง</h3>
+                <div class="control-grid">
+                    <div class="field">
+                        <label for="cameraSelect" class="field-label">เลือกกล้อง</label>
+                        <select id="cameraSelect" title="เลือกกล้อง" onchange="onCameraChange(this.value)"></select>
+                    </div>
+                    <div class="field">
+                        <label for="cameraHeightInput" class="field-label">ความสูงกล้อง (เมตร)</label>
+                        <input id="cameraHeightInput" type="number" class="input" min="0.5" max="3" step="0.1" value="1.5" onchange="updateCameraHeight(this.value)" placeholder="ความสูงกล้องจากพื้น">
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-info" id="refreshBtn" onclick="refreshCameras()" style="display:none">🔄 รีเฟรชกล้อง</button>
+                        <button class="btn btn-info" onclick="resetPerspectiveSettings()">🔄 รีเซ็ตการตั้งค่า</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Measurement Controls -->
+            <div class="control-section" id="measurementControls">
+                <h3>📐 การตั้งค่าการวัด</h3>
+                <div class="control-grid">
+                    <div class="field">
+                        <label for="scaleInput" class="field-label">สเกล (พิกเซลต่อ 1 เมตร)</label>
+                        <input id="scaleInput" type="number" class="input" min="1" step="1" value="100" title="สเกล (พิกเซลต่อเมตร)" placeholder="เช่น 200 หมายถึง 200px = 1ม.">
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn" id="calibBtn" onclick="toggleCalibration()">🎯 คาลิเบรตสเกล</button>
+                        <button class="btn btn-info" onclick="autoCalibrate()">🎯 คาลิเบรตอัตโนมัติ</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Height Mode Controls -->
+            <div class="control-section" id="heightControls" style="display: none;">
+                <h3>📐 เครื่องคิดเลข Law of Cosines</h3>
+                <p style="font-size: 12px; color: #e1e1e1; margin: 5px 0 15px;">สูตร: c² = a² + b² - 2ab cos(C) เมื่อ c = ความสูง</p>
+                <div class="control-grid">
+                    <div class="field">
+                        <label for="angleInput" class="field-label">มุม C (องศา)</label>
+                        <input id="angleInput" type="number" class="input" min="0" max="180" step="0.1" value="90" placeholder="กรอกมุม C ในหน่วยองศา" onchange="calculateHeightFromLawOfCosines()">
+                    </div>
+                    <div class="field">
+                        <label for="sideAInput" class="field-label">ด้าน a (เมตร)</label>
+                        <input id="sideAInput" type="number" class="input" min="0.1" max="100" step="0.1" value="3.0" placeholder="กรอกความยาวด้าน a" onchange="calculateHeightFromLawOfCosines()">
+                    </div>
+                    <div class="field">
+                        <label for="sideBInput" class="field-label">ด้าน b (เมตร)</label>
+                        <input id="sideBInput" type="number" class="input" min="0.1" max="100" step="0.1" value="4.0" placeholder="กรอกความยาวด้าน b" onchange="calculateHeightFromLawOfCosines()">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>วิธีใช้งาน:</h3>
+            <ul id="instructionsList">
+                <li><strong>โหมดระยะทาง:</strong> เลือกจุดเริ่มต้นและจุดสิ้นสุด กดปุ่ม "เพิ่มจุด" ที่จุดทั้งสอง แล้วกด "คำนวณ"</li>
+                <li><strong>โหมดพื้นที่:</strong> เพิ่มจุดรอบๆ พื้นที่ที่ต้องการวัด (อย่างน้อย 3 จุด) แล้วกด "คำนวณ"</li>
+                <li><strong>โหมดความสูง:</strong> กรอกค่ามุม C และความยาวด้าน a, b ในเครื่องคิดเลข Law of Cosines แล้วกด "คำนวณ"</li>
+                <li><strong>โหมดมุม:</strong> เลือก 3 จุด (จุดแรกเป็นจุดยอดของมุม) แล้วกด "คำนวณ"</li>
+            </ul>
+        </div>
+        
+        <!-- Results Section -->
+        <div class="results">
+            <h3 style="color: #00ff88; margin-bottom: 15px; text-align: center;">📊 ผลลัพธ์การวัด</h3>
+            <div class="result-grid">
+                <div class="result-item">
+                    <div class="result-label">ระยะทาง:</div>
+                    <div class="result-value" id="distance">0 ม.</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">พื้นที่:</div>
+                    <div class="result-value" id="area">0 ตร.ม.</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">ความสูง:</div>
+                    <div class="result-value" id="height">0 ม.</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">มุม:</div>
+                    <div class="result-value" id="angle">0°</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">จำนวนจุด:</div>
+                    <div class="result-value" id="point-count">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ฟังก์ชันพื้นฐานสำหรับการทำงานของแอป
+        let currentMode = 'distance';
+        let points = [];
+        
+        function setMode(mode, btn) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // ซ่อน/แสดงส่วนควบคุมตามโหมด
+            document.getElementById('heightControls').style.display = 
+                (mode === 'height') ? 'block' : 'none';
+            
+            // ล้างจุดเมื่อเปลี่ยนโหมด
+            clearPoints();
+        }
+        
+        function addPoint() {
+            // จำลองการเพิ่มจุด
+            points.push({x: 100, y: 100});
+            updateInfo();
+        }
+        
+        function clearPoints() {
+            points = [];
+            updateInfo();
+        }
+        
+        function undoPoint() {
+            if (points.length > 0) {
+                points.pop();
+                updateInfo();
+            }
+        }
+        
+        function updateInfo() {
+            document.getElementById('info').textContent = `จุดที่วัด: ${points.length}`;
+            document.getElementById('point-count').textContent = points.length;
+        }
+        
+        function calculate() {
+            // จำลองการคำนวณ
+            alert(`คำนวณผลลัพธ์ในโหมด ${currentMode} ด้วยจุด ${points.length} จุด`);
+        }
+        
+        function toggleCamera() {
+            alert("เปิด/ปิด กล้อง");
+        }
+        
+        function calculateHeightFromLawOfCosines() {
+            // จำลองการคำนวณความสูง
+            const angle = document.getElementById('angleInput').value;
+            const sideA = document.getElementById('sideAInput').value;
+            const sideB = document.getElementById('sideBInput').value;
+            
+            alert(`คำนวณความสูงด้วยมุม ${angle}° และด้าน ${sideA}m, ${sideB}m`);
+        }
+        
+        function toggleCalibration() {
+            alert("เปิดโหมดคาลิเบรต");
+        }
+        
+        function autoCalibrate() {
+            alert("คาลิเบรตอัตโนมัติ");
+        }
+        
+        function refreshCameras() {
+            alert("รีเฟรชกล้อง");
+        }
+        
+        function resetPerspectiveSettings() {
+            alert("รีเซ็ตการตั้งค่า");
+        }
+        
+        function updateCameraHeight(value) {
+            console.log("อัปเดตความสูงกล้อง: ", value);
+        }
+        
+        function onCameraChange(value) {
+            console.log("เปลี่ยนกล้อง: ", value);
+        }
+        
+        // เริ่มต้นแอป
+        window.addEventListener('load', () => {
+            console.log('แอปเริ่มต้นเรียบร้อยแล้ว');
+            updateInfo();
+        });
+    </script>
+</body>
+</html>

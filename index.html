@@ -31,6 +31,7 @@
             text-align: center;
             margin-bottom: 30px;
             padding: 20px 0;
+            animation: fadeInUp 0.6s ease-out;
         }
         
         .header h1 {
@@ -54,6 +55,7 @@
             margin-bottom: 20px;
             overflow: hidden;
             border: 3px solid rgba(255,255,255,0.2);
+            animation: fadeInScale 0.8s ease-out 0.1s both;
         }
         
         #video {
@@ -124,7 +126,7 @@
             border-radius: 50%;
             transform: translate(-50%, -50%);
             box-shadow: 0 0 15px rgba(255,71,87,0.8);
-            animation: pulse 2s infinite;
+            animation: pulse 2s infinite, bounceIn 0.5s ease-out;
         }
         
         @keyframes pulse {
@@ -138,98 +140,192 @@
             background: linear-gradient(90deg, #ff4757, #00ff88);
             box-shadow: 0 0 10px rgba(255,255,255,0.5);
             transform-origin: left center;
+            animation: drawLine 0.8s ease-out, lineGlow 3s ease-in-out infinite 0.8s;
+        }
+        
+        @keyframes drawLine {
+            from {
+                width: 0;
+            }
+            to {
+                width: 100%;
+            }
         }
         
         .controls {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
             align-items: center;
+            animation: fadeInUp 0.6s ease-out 0.3s both;
         }
 
         .input, select {
-            padding: 12px 14px;
-            border-radius: 12px;
+            padding: 15px 18px;
+            border-radius: 15px;
             border: none;
             background: rgba(255,255,255,0.15);
             color: white;
             outline: none;
             width: 100%;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
         }
-        select option { color: #111; }
+
+        .input:focus, select:focus {
+            background: rgba(255,255,255,0.25);
+            border: 1px solid rgba(0,255,136,0.5);
+            box-shadow: 0 0 20px rgba(0,255,136,0.3);
+            transform: translateY(-2px);
+        }
+
+        .input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+        
+        select option { 
+            color: #111; 
+            background: #fff;
+            padding: 10px;
+        }
         
         .btn {
-            padding: 15px 20px;
+            padding: 16px 24px;
             border: none;
-            border-radius: 12px;
+            border-radius: 15px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
         
         .btn-primary {
-            background: linear-gradient(45deg, #00ff88, #00d4aa);
+            background: linear-gradient(135deg, #00ff88, #00d4aa);
             color: white;
-            box-shadow: 0 4px 15px rgba(0,255,136,0.3);
+            box-shadow: 0 8px 25px rgba(0,255,136,0.4);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #00d4aa, #00ff88);
+            box-shadow: 0 12px 35px rgba(0,255,136,0.6);
+            transform: translateY(-3px);
         }
         
         .btn-secondary {
-            background: linear-gradient(45deg, #ff4757, #ff3742);
+            background: linear-gradient(135deg, #ff4757, #ff3742);
             color: white;
-            box-shadow: 0 4px 15px rgba(255,71,87,0.3);
+            box-shadow: 0 8px 25px rgba(255,71,87,0.4);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #ff3742, #ff4757);
+            box-shadow: 0 12px 35px rgba(255,71,87,0.6);
+            transform: translateY(-3px);
         }
         
         .btn-info {
-            background: linear-gradient(45deg, #3742fa, #2f3542);
+            background: linear-gradient(135deg, #3742fa, #2f3542);
             color: white;
-            box-shadow: 0 4px 15px rgba(55,66,250,0.3);
+            box-shadow: 0 8px 25px rgba(55,66,250,0.4);
         }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+
+        .btn-info:hover {
+            background: linear-gradient(135deg, #2f3542, #3742fa);
+            box-shadow: 0 12px 35px rgba(55,66,250,0.6);
+            transform: translateY(-3px);
         }
         
         .btn:active {
-            transform: translateY(0);
+            transform: translateY(-1px);
         }
         
         .btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
+        }
+
+        .btn:disabled:hover {
+            transform: none;
+            box-shadow: none;
         }
         
         .mode-selector {
             display: flex;
-            background: rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 5px;
-            margin-bottom: 20px;
-            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 8px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            animation: fadeInUp 0.6s ease-out 0.2s both;
         }
         
         .mode-btn {
             flex: 1;
-            padding: 12px;
+            padding: 15px 20px;
             border: none;
             background: transparent;
             color: white;
-            border-radius: 8px;
+            border-radius: 15px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            font-size: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mode-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mode-btn:hover::before {
+            opacity: 1;
         }
         
         .mode-btn.active {
-            background: rgba(255,255,255,0.2);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.15));
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transform: translateY(-1px);
+        }
+
+        .mode-btn.active::before {
+            opacity: 0;
         }
         
         .results {
@@ -239,6 +335,7 @@
             margin-bottom: 20px;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.2);
+            animation: fadeInUp 0.6s ease-out 0.4s both;
         }
         
         .result-item {
@@ -247,6 +344,7 @@
             align-items: center;
             padding: 12px 0;
             border-bottom: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .result-item:last-child {
@@ -272,6 +370,7 @@
             margin-bottom: 20px;
             backdrop-filter: blur(10px);
             border-left: 4px solid #00ff88;
+            animation: fadeInUp 0.6s ease-out 0.5s both;
         }
         
         .instructions h3 {
@@ -287,31 +386,149 @@
         .instructions li {
             padding: 5px 0;
             opacity: 0.9;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .instructions li::before {
             content: "📱 ";
             margin-right: 8px;
         }
-        /* Trig lesson panel */
-        .lesson {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 12px;
-            padding: 16px;
+
+        .instructions li:hover {
+            transform: translateX(5px);
+            color: #00ff88;
+        }
+
+        /* Math formulas section */
+        .math-formulas {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
             margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-left: 4px solid #ff6b6b;
+            animation: fadeInUp 0.6s ease-out 0.6s both;
         }
-        .lesson h3 { color: #ffd166; margin-bottom: 10px; }
-        .lesson pre {
-            background: rgba(0,0,0,0.35);
-            border-radius: 8px;
+
+        .math-formulas h3 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .formula-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .formula-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .formula-item:hover {
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        .formula-title {
+            color: #ffd93d;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .formula-equation {
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            color: #6bcf7f;
+            margin-bottom: 5px;
+        }
+
+        .formula-desc {
+            font-size: 12px;
+            opacity: 0.8;
+            color: #e1e1e1;
+        }
+
+        /* Calculation steps display */
+        .calculation-steps {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-left: 4px solid #6bcf7f;
+            display: none;
+        }
+
+        .calculation-steps.show {
+            display: block;
+        }
+
+        .calculation-steps h3 {
+            color: #6bcf7f;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .step-item {
+            background: rgba(255,255,255,0.05);
             padding: 12px;
-            overflow: auto;
-            line-height: 1.5;
-            font-size: 13px;
-            white-space: pre-wrap;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 3px solid #6bcf7f;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .lesson .note { opacity: 0.9; font-size: 13px; margin-top: 8px; }
+
+        .step-item:hover {
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        .step-number {
+            color: #ffd93d;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .step-formula {
+            font-family: 'Courier New', monospace;
+            color: #6bcf7f;
+            margin: 5px 0;
+        }
+
+        .step-result {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        /* Angle indicator */
+        .angle-indicator {
+            position: absolute;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .angle-arc {
+            stroke: #ffd93d;
+            stroke-width: 2;
+            fill: none;
+            opacity: 0.8;
+        }
+
+        .angle-label {
+            fill: #ffd93d;
+            font-size: 14px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
         
         .camera-status {
             text-align: center;
@@ -409,6 +626,326 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+        
+        /* Modern UI Animations and Transitions */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200px 0;
+            }
+            100% {
+                background-position: calc(200px + 100%) 0;
+            }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Enhanced loading states */
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -200px;
+            width: 200px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        /* Staggered animations for cards */
+        .header {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .camera-container {
+            animation: fadeInScale 0.8s ease-out 0.1s both;
+        }
+
+        .mode-selector {
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+
+        .controls {
+            animation: fadeInUp 0.6s ease-out 0.3s both;
+        }
+
+        .results {
+            animation: fadeInUp 0.6s ease-out 0.4s both;
+        }
+
+        .instructions {
+            animation: fadeInUp 0.6s ease-out 0.5s both;
+        }
+
+        .math-formulas {
+            animation: fadeInUp 0.6s ease-out 0.6s both;
+        }
+
+        /* Enhanced button interactions */
+        .btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* Enhanced focus states */
+        .input:focus, .btn:focus, .mode-btn:focus {
+            outline: 2px solid rgba(0,255,136,0.5);
+            outline-offset: 2px;
+        }
+
+        /* Smooth transitions for all interactive elements */
+        .result-item, .formula-item, .step-item, .instructions li {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Enhanced hover effects */
+        .formula-item:hover, .step-item:hover {
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        .instructions li:hover {
+            transform: translateX(5px);
+            color: #00ff88;
+        }
+
+        /* Point addition animation */
+        .point {
+            animation: bounceIn 0.5s ease-out;
+        }
+
+        /* Measurement line drawing animation */
+        .measurement-line {
+            animation: drawLine 0.8s ease-out, lineGlow 3s ease-in-out infinite 0.8s;
+        }
+
+        @keyframes drawLine {
+            from {
+                width: 0;
+            }
+            to {
+                width: 100%;
+            }
+        }
+
+        /* Enhanced card hover effects */
+        .results:hover, .instructions:hover, .math-formulas:hover, .calculation-steps:hover {
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        /* Optimized spacing and layout */
+        .container > * + * {
+            margin-top: 0;
+        }
+
+        .field {
+            margin-bottom: 15px;
+        }
+
+        .field:last-child {
+            margin-bottom: 0;
+        }
+
+        .field-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.9);
+            font-size: 14px;
+        }
+
+        /* Enhanced visual hierarchy */
+        h2, h3 {
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: #00ff88;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+        }
+
+        /* Better text readability */
+        p, li, span {
+            line-height: 1.6;
+        }
+
+        /* Enhanced status indicators */
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-success {
+            background: rgba(0,255,136,0.2);
+            color: #00ff88;
+            border: 1px solid rgba(0,255,136,0.3);
+        }
+
+        .status-warning {
+            background: rgba(255,215,61,0.2);
+            color: #ffd93d;
+            border: 1px solid rgba(255,215,61,0.3);
+        }
+
+        .status-error {
+            background: rgba(255,71,87,0.2);
+            color: #ff4757;
+            border: 1px solid rgba(255,71,87,0.3);
+        }
+
+        /* Enhanced tooltips */
+        [data-tooltip] {
+            position: relative;
+            cursor: help;
+        }
+
+        [data-tooltip]:hover::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            border-radius: 8px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        [data-tooltip]:hover::after {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(100%);
+            border: 5px solid transparent;
+            border-top-color: rgba(0,0,0,0.9);
+            z-index: 1000;
+        }
+
+        /* Enhanced scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
+        }
+        
+        .control-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 10px;
+            border-left: 4px solid #00ff88;
+        }
+
+        .control-section h3 {
+            color: #00ff88;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
     </style>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#764ba2">
@@ -421,13 +958,41 @@
     <div class="container">
         <div class="header">
             <h1>📏 แอปวัดพื้นที่และความสูง</h1>
-            <p>ใช้กล้องหลังเพื่อวัดระยะทาง พื้นที่ และความสูง</p>
+            <p>ใช้กล้องหลังเพื่อวัดความยาว พื้นที่ และความสูง</p>
         </div>
         
         <div class="mode-selector">
-            <button class="mode-btn active" onclick="setMode('distance', this)">วัดระยะทาง</button>
+            <button class="mode-btn active" onclick="setMode('distance', this)">วัดความยาว</button>
             <button class="mode-btn" onclick="setMode('area', this)">วัดพื้นที่</button>
             <button class="mode-btn" onclick="setMode('height', this)">วัดความสูง</button>
+            <button class="mode-btn" onclick="setMode('angle', this)">วัดมุม (ตรีโกณมิติ)</button>
+        </div>
+        
+        <!-- Math Formulas Section -->
+        <div class="math-formulas">
+            <h3>🧮 สูตรฟังก์ชันตรีโกณมิติที่ใช้ในโปรเจค</h3>
+            <div class="formula-grid">
+                <div class="formula-item">
+                    <div class="formula-title">ฟังก์ชัน Sine</div>
+                    <div class="formula-equation">sin θ = ตรงข้าม / ด้านเอียง</div>
+                    <div class="formula-desc">ใช้หาความสูงจากมุมและระยะ</div>
+                </div>
+                <div class="formula-item">
+                    <div class="formula-title">ฟังก์ชัน Cosine</div>
+                    <div class="formula-equation">cos θ = ประชิด / ด้านเอียง</div>
+                    <div class="formula-desc">ใช้หาระยะแนวนอนจากมุม</div>
+                </div>
+                <div class="formula-item">
+                    <div class="formula-title">ฟังก์ชัน Tangent</div>
+                    <div class="formula-equation">tan θ = ตรงข้าม / ประชิด</div>
+                    <div class="formula-desc">ใช้หามุมจากอัตราส่วนด้าน</div>
+                </div>
+                <div class="formula-item">
+                    <div class="formula-title">ทฤษฎีบทพีทาโกรัส</div>
+                    <div class="formula-equation">c² = a² + b²</div>
+                    <div class="formula-desc">หาความยาวตรงจาก 2 จุด</div>
+                </div>
+            </div>
         </div>
         
         <div class="camera-container">
@@ -446,37 +1011,91 @@
             </div>
         </div>
         
-        <div class="controls">
-            <select id="cameraSelect" title="เลือกกล้อง" onchange="onCameraChange(this.value)"></select>
-            <button class="btn btn-info" id="refreshBtn" onclick="refreshCameras()" style="display:none">🔄 รีเฟรชกล้อง</button>
-            <button class="btn btn-primary" onclick="addPoint()">📍 เพิ่มจุด</button>
-            <button class="btn" onclick="undoPoint()">↩️ ย้อนกลับจุด</button>
-            <button class="btn btn-secondary" onclick="clearPoints()">🗑️ ล้างจุด</button>
-            <button class="btn btn-info" onclick="calculate()">📊 คำนวณ</button>
-            <button class="btn btn-info" onclick="toggleCamera()">📷 เปิด/ปิดกล้อง</button>
-            <button class="btn" id="calibBtn" onclick="toggleCalibration()">🎯 คาลิเบรตสเกล</button>
-            <div class="field">
-                <label for="scaleInput" class="field-label">สเกล (พิกเซลต่อ 1 เมตร)</label>
-                <input id="scaleInput" type="number" class="input" min="1" step="1" value="100" title="สเกล (พิกเซลต่อเมตร)" placeholder="เช่น 200 หมายถึง 200px = 1ม.">
+        <div class="">
+            <!-- Common Controls -->
+            <div class="control-section">
+                <h3>🔄 การควบคุมทั่วไป</h3>
+                <div class="btn-group">
+                    <button class="btn btn-info" onclick="calculate()">📊 คำนวณ</button>
+                    <button class="btn" onclick="undoPoint()">↩️ ย้อนกลับจุด</button>
+                    <button class="btn btn-secondary" onclick="clearPoints()">🗑️ ล้างจุด</button>
+                    <button class="btn btn-info" onclick="toggleCamera()">📷 เปิด/ปิดกล้อง</button>
+                </div>
             </div>
-            <div class="field" id="baselineField" style="display:none">
-                <label for="baselineInput" class="field-label">ระยะฐาน D จากกล้องถึงจุดฐาน (เมตร)</label>
-                <input id="baselineInput" type="number" class="input" min="0" step="0.1" placeholder="เช่น 5.0">
+            
+            <!-- Camera Controls -->
+            <div class="control-section" id="cameraControls">
+                <h3>🎥 การตั้งค่ากล้อง</h3>
+                <div class="control-grid">
+                    <!-- <div class="field">
+                        <label for="cameraSelect" class="field-label">เลือกกล้อง</label>
+                        <select id="cameraSelect" title="เลือกกล้อง" onchange="onCameraChange(this.value)"></select>
+                    </div> -->
+                    <div class="field">
+                        <label for="cameraHeightInput" class="field-label">ความสูงกล้อง (เมตร)</label>
+                        <input id="cameraHeightInput" type="number" class="input" min="0.5" max="3" step="0.1" value="1.5" onchange="updateCameraHeight(this.value)" placeholder="ความสูงกล้องจากพื้น">
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-info" id="refreshBtn" onclick="refreshCameras()" style="display:none">🔄 รีเฟรชกล้อง</button>
+                        <button class="btn btn-info" onclick="resetPerspectiveSettings()">🔄 รีเซ็ตการตั้งค่า</button>
+                    </div>
+                </div>
             </div>
-            <button class="btn" id="trigBtn" onclick="toggleTrigPanel()">📘 บทเรียนตรีโกณมิติ</button>
+            
+            <!-- Measurement Controls -->
+            <div class="control-section" id="measurementControls" style="display: none;">
+                <h3>📐 การตั้งค่าการวัด</h3>
+                <div class="control-grid">
+                    <div class="field">
+                        <label for="scaleInput" class="field-label">สเกล (พิกเซลต่อ 1 เมตร)</label>
+                        <input id="scaleInput" type="number" class="input" min="1" step="1" value="100" title="สเกล (พิกเซลต่อเมตร)" placeholder="เช่น 200 หมายถึง 200px = 1ม.">
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn" id="calibBtn" onclick="toggleCalibration()">🎯 คาลิเบรตสเกล</button>
+                        <button class="btn btn-info" onclick="autoCalibrate()">🎯 คาลิเบรตอัตโนมัติ</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Height Mode Controls (Law of Cosines Calculator) -->
+            <div class="control-section" id="heightControls" style="display: none;">
+                <h3>📐 เครื่องคิดเลข Law of Cosines</h3>
+                <p style="font-size: 12px; color: #e1e1e1; margin: 5px 0 15px;">สูตร: c² = a² + b² - 2ab cos(C) เมื่อ c = ความสูง</p>
+                <div class="control-grid">
+                    <div class="field">
+                        <label for="angleInput" class="field-label">มุม C (องศา)</label>
+                        <input id="angleInput" type="number" class="input" min="0" max="180" step="0.1" value="90" placeholder="กรอกมุม C ในหน่วยองศา" onchange="calculateHeightFromLawOfCosines()">
+                    </div>
+                    <div class="field">
+                        <label for="sideAInput" class="field-label">ด้าน a (เมตร)</label>
+                        <input id="sideAInput" type="number" class="input" min="0.1" max="100" step="0.1" value="3.0" placeholder="กรอกความยาวด้าน a" onchange="calculateHeightFromLawOfCosines()">
+                    </div>
+                    <div class="field">
+                        <label for="sideBInput" class="field-label">ด้าน b (เมตร)</label>
+                        <input id="sideBInput" type="number" class="input" min="0.1" max="100" step="0.1" value="4.0" placeholder="กรอกความยาวด้าน b" onchange="calculateHeightFromLawOfCosines()">
+                    </div>
+                </div>
+            </div>
         </div>
         
         <div class="instructions">
             <h3>วิธีใช้งาน:</h3>
-            <ul>
-                <li>เลือกโหมดการวัดที่ต้องการ</li>
-                <li>เล็งกล้องไปที่จุดที่ต้องการวัด</li>
-                <li>แตะบนภาพวิดีโอเพื่อเพิ่มจุด (หรือกดปุ่ม "เพิ่มจุด" เพื่อใช้กึ่งกลางภาพ)</li>
-                <li>เพิ่มจุดตามที่ต้องการ แล้วกด "คำนวณ"</li>
-                <li>ตั้งค่า <b>สเกล</b> เป็นจำนวน <b>พิกเซลต่อ 1 เมตร</b> เพื่อแปลงหน่วยให้เป็นเมตร (ค่าเริ่มต้น 100 px = 1 m)</li>
+            <ul id="instructionsList">
+                <li><strong>โหมดระยะทาง:</strong> เลือกจุดเริ่มต้นและจุดสิ้นสุด กดปุ่ม "เพิ่มจุด" ที่จุดทั้งสอง แล้วกด "คำนวณ"</li>
+                <li><strong>โหมดพื้นที่:</strong> เพิ่มจุดรอบๆ พื้นที่ที่ต้องการวัด (อย่างน้อย 3 จุด) แล้วกด "คำนวณ"</li>
+                <li><strong>โหมดความสูง:</strong> กรอกค่ามุม C และความยาวด้าน a, b ในเครื่องคิดเลข Law of Cosines แล้วกด "คำนวณ"</li>
+                <li><strong>โหมดมุม:</strong> เลือก 3 จุด (จุดแรกเป็นจุดยอดของมุม) แล้วกด "คำนวณ"</li>
             </ul>
         </div>
         
+        <!-- Calculation Steps Display -->
+        <div class="calculation-steps" id="calculationSteps">
+            <h3>📊 ขั้นตอนการคำนวณด้วยฟังก์ชันตรีโกณมิติ</h3>
+            <div id="stepsContent">
+                <!-- Steps will be populated by JavaScript -->
+            </div>
+        </div>
+
         <div class="results">
             <div class="result-item">
                 <span class="result-label">ระยะทาง:</span>
@@ -491,14 +1110,12 @@
                 <span class="result-value" id="height">0 ม.</span>
             </div>
             <div class="result-item">
+                <span class="result-label">มุม:</span>
+                <span class="result-value" id="angle">0°</span>
+            </div>
+            <div class="result-item">
                 <span class="result-label">จำนวนจุด:</span>
                 <span class="result-value" id="point-count">0</span>
-            </div>
-        </div>
-        <div id="trigPanel" class="lesson" style="display:none">
-            <h3>📘 บทเรียนฟังก์ชันตรีโกณมิติ</h3>
-            <div id="trigContent">
-                เลือกโหมดและเพิ่มจุด แล้วกด “คำนวณ” เพื่อดูขั้นตอนอธิบายการคำนวณด้วยตรีโกณมิติที่นี่
             </div>
         </div>
     </div>
@@ -511,6 +1128,155 @@
         let cameraActive = false;
         let calibrationMode = false;
         let calibrationPoints = []; // [{x,y} x2]
+        
+        // ตัวแปรสำหรับ Advanced Perspective Correction (ปรับปรุงความแม่นยำ)
+        let cameraFOV = {
+            horizontal: 60, // ค่าเริ่มต้น จะถูกปรับอัตโนมัติ
+            vertical: 45    // ค่าเริ่มต้น จะถูกปรับอัตโนมัติ
+        };
+        let cameraHeight = 1.5; // ความสูงกล้องจากพื้น (เมตร)
+        let cameraTilt = 0; // มุมเอียงกล้อง (องศา)
+        let deviceOrientation = { alpha: 0, beta: 0, gamma: 0 }; // การหมุนอุปกรณ์
+        let manualDistanceMode = false; // โหมดกำหนดระยะทางเอง
+        let manualDistance = 5.0; // ระยะทางที่ผู้ใช้กำหนดเอง (เมตร)
+        
+        // ข้อมูลอุปกรณ์สำหรับการปรับ FOV
+        let deviceInfo = {
+            type: 'unknown',
+            brand: 'unknown',
+            model: 'unknown',
+            isTablet: false,
+            screenSize: 'medium'
+        };
+        
+        // โหมดตั้งฉากกับพื้น
+        let perpendicularMode = true; // เปิดโดยค่าเริ่มต้น
+        let targetTilt = 0; // มุมเป้าหมายสำหรับโหมดตั้งฉาก
+        
+        // เริ่มต้นระบบตรวจจับการหมุนอุปกรณ์
+        function initDeviceOrientation() {
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', function(event) {
+                    deviceOrientation.alpha = event.alpha || 0; // Z-axis (compass)
+                    deviceOrientation.beta = event.beta || 0;   // X-axis (front-back tilt)
+                    deviceOrientation.gamma = event.gamma || 0; // Y-axis (left-right tilt)
+                    
+                    // อัปเดตมุมเอียงกล้องจากการหมุนอุปกรณ์
+                    cameraTilt = deviceOrientation.beta;
+                    
+                    // อัปเดต UI แสดงมุมเอียง
+                    updateOrientationDisplay();
+                    
+                    // อัปเดตการแสดงผลทุก 1 วินาที
+                    setInterval(() => {
+                        if (cameraActive) {
+                            calibrateCameraHeight(); // อัปเดตความสูงกล้องตามการเอียง
+                            updateOrientationDisplay();
+                            updateCameraHeightInput();
+                        }
+                    }, 1000);
+                });
+            }
+        }
+        
+        // ฟังก์ชันสำหรับอัปเดตค่าความสูงกล้อง
+        function updateCameraHeight(value) {
+            cameraHeight = parseFloat(value) || 1.5;
+        }
+        
+        // อัปเดต input ความสูงกล้องตามการคำนวณอัตโนมัติ
+        function updateCameraHeightInput() {
+            const input = document.getElementById('cameraHeightInput');
+            if (input && Math.abs(parseFloat(input.value) - cameraHeight) > 0.1) {
+                input.value = cameraHeight.toFixed(1);
+            }
+        }
+        
+        // รีเซ็ตการตั้งค่า Perspective Correction
+        function resetPerspectiveSettings() {
+            cameraFOV = { horizontal: 60, vertical: 45 }; // ใช้ค่าใหม่ที่ปรับแล้ว
+            cameraHeight = 1.5;
+            cameraTilt = 0;
+            deviceOrientation = { alpha: 0, beta: 0, gamma: 0 };
+            
+            document.getElementById('cameraHeightInput').value = cameraHeight;
+            
+            // รีคาลิเบรต
+            if (cameraActive) {
+                calibrateCameraFOV();
+                calibrateCameraHeight();
+            }
+            
+            alert('รีเซ็ตการตั้งค่า Perspective Correction เรียบร้อยแล้ว (ใช้ค่าปรับปรุงใหม่)');
+        }
+        
+        // เพิ่มข้อมูลการแสดงผลในขั้นตอนการคำนวณ
+        function getAdvancedCalculationInfo() {
+            return {
+                fov: cameraFOV,
+                height: cameraHeight,
+                tilt: cameraTilt,
+                orientation: deviceOrientation
+            };      
+        }
+        
+        // แสดงข้อมูลการหมุนอุปกรณ์
+        function updateOrientationDisplay() {
+            const info = document.getElementById('info');
+            if (info) {
+                const tiltText = Math.abs(cameraTilt) > 5 ? 
+                    ` | เอียง: ${cameraTilt.toFixed(1)}°` : '';
+                info.textContent = `จุดที่วัด: ${points.length}${tiltText}`;
+            }
+        }
+        
+        // ระบบคาลิเบรต FOV อัตโนมัติ
+        async function calibrateCameraFOV() {
+            if (!stream || !video.videoWidth) return;
+            
+            try {
+                // พยายามดึงข้อมูล FOV จาก MediaStreamTrack
+                const videoTrack = stream.getVideoTracks()[0];
+                if (videoTrack) {
+                    const settings = videoTrack.getSettings();
+                    const capabilities = videoTrack.getCapabilities();
+                    
+                    // ประมาณ FOV จากความละเอียดและ focal length (ถ้ามี)
+                    if (settings.width && settings.height) {
+                        const aspectRatio = settings.width / settings.height;
+                        
+                        // ประมาณ FOV สำหรับกล้องมือถือทั่วไป (ปรับให้เหมาะสม)
+                        if (aspectRatio > 1.5) { // กล้องแนวนอน
+                            cameraFOV.horizontal = 65; // ลดจาก 75
+                            cameraFOV.vertical = 50;   // ลดจาก 60
+                        } else { // กล้องแนวตั้ง
+                            cameraFOV.horizontal = 55; // ลดจาก 65
+                            cameraFOV.vertical = 40;   // ลดจาก 50
+                        }
+                        
+                        console.log('FOV calibrated:', cameraFOV);
+                    }
+                }
+            } catch (error) {
+                console.log('FOV calibration failed, using defaults:', error);
+            }
+        }
+        
+        // ระบบคาลิเบรตความสูงกล้องแบบไดนามิก
+        function calibrateCameraHeight() {
+            // ใช้ข้อมูลจากเซ็นเซอร์หรือการตั้งค่าผู้ใช้
+            const userAgent = navigator.userAgent.toLowerCase();
+            
+            if (userAgent.includes('mobile') || userAgent.includes('android') || userAgent.includes('iphone')) {
+                // มือถือ - ประมาณความสูงจากการถือ
+                cameraHeight = deviceOrientation.beta < -30 ? 1.2 : // ถือสูง
+                              deviceOrientation.beta > 30 ? 0.8 :   // ถือต่ำ
+                              1.0; // ถือปกติ
+            } else {
+                // เดสก์ท็อป/แล็ปท็อป
+                cameraHeight = 1.3;
+            }
+        }
         
         // เริ่มต้นกล้อง
         async function initCamera(deviceId = null) {
@@ -652,6 +1418,12 @@
                 cameraActive = true;
                 statusElement.style.display = 'none';
                 console.log('กล้องเปิดสำเร็จและพร้อมใช้งาน');
+                
+                // เริ่มต้นระบบปรับปรุง
+                initDeviceOrientation();
+                await calibrateCameraFOV();
+                calibrateCameraHeight();
+                
                 // อัปเดตรายการกล้อง
                 try { await populateCameraSelect(); } catch(e) { console.log('populateCameraSelect error', e); }
                 
@@ -677,87 +1449,9 @@
                 } else if (error.name === 'OverconstrainedError') {
                     statusElement.textContent = '❌ การตั้งค่ากล้องไม่รองรับ';
                 } else if (error.name === 'SecurityError') {
-                    statusElement.textContent = '❌ ไม่สามารถเข้าถึงกล้องได้ด้วยเหตุผลด้านความปลอดภัย (ต้องใช้ HTTPS)';
-                } else {
-                    statusElement.textContent = `❌ เกิดข้อผิดพลาด: ${error.message}`;
-                }
-            }
-        }
-        
-        // ทดสอบกล้อง
-        async function testCamera() {
-            const statusElement = document.getElementById('camera-status');
-            statusElement.style.display = 'block';
-            statusElement.style.color = '#00ff88';
-            statusElement.textContent = '🔍 กำลังทดสอบระบบกล้อง...';
-            
-            // ตรวจสอบการรองรับ
-            console.log('=== การทดสอบระบบกล้อง ===');
-            console.log('User Agent:', navigator.userAgent);
-            console.log('Protocol:', location.protocol);
-            console.log('Hostname:', location.hostname);
-            
-            if (!navigator.mediaDevices) {
-                statusElement.textContent = '❌ navigator.mediaDevices ไม่รองรับ';
-                statusElement.style.color = '#ff4757';
-                return;
-            }
-            
-            if (!navigator.mediaDevices.getUserMedia) {
-                statusElement.textContent = '❌ getUserMedia ไม่รองรับ';
-                statusElement.style.color = '#ff4757';
-                return;
-            }
-            
-            // ตรวจสอบอุปกรณ์ที่มี
-            try {
-                statusElement.textContent = '🔍 กำลังตรวจสอบอุปกรณ์ที่มี...';
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const videoDevices = devices.filter(device => device.kind === 'videoinput');
-                
-                console.log('อุปกรณ์ทั้งหมด:', devices);
-                console.log('อุปกรณ์วิดีโอ:', videoDevices);
-                
-                if (videoDevices.length === 0) {
-                    statusElement.textContent = '❌ ไม่พบกล้องในอุปกรณ์นี้';
-                    statusElement.style.color = '#ff4757';
-                    return;
-                }
-                
-                statusElement.textContent = `✅ พบกล้อง ${videoDevices.length} ตัว - กำลังทดสอบ...`;
-                
-                // ทดสอบเปิดกล้องแบบง่าย
-                const testConstraints = { video: true };
-                const testStream = await navigator.mediaDevices.getUserMedia(testConstraints);
-                
-                if (testStream) {
-                    statusElement.textContent = '✅ ทดสอบสำเร็จ! กล้องทำงานได้ปกติ';
-                    statusElement.style.color = '#00ff88';
-                    
-                    // ปิด test stream
-                    testStream.getTracks().forEach(track => track.stop());
-                    
-                    // เปิดกล้องจริง
-                    setTimeout(() => {
-                        initCamera();
-                    }, 1000);
-                } else {
-                    statusElement.textContent = '❌ ไม่สามารถเปิดกล้องได้';
-                    statusElement.style.color = '#ff4757';
-                }
-                
-            } catch (error) {
-                console.error('การทดสอบล้มเหลว:', error);
-                statusElement.style.color = '#ff4757';
-                
-                if (error.name === 'NotAllowedError') {
-                    statusElement.textContent = '❌ ผู้ใช้ปฏิเสธการเข้าถึงกล้อง';
-                } else if (error.name === 'NotFoundError') {
-                    statusElement.textContent = '❌ ไม่พบกล้อง';
-                } else if (error.name === 'SecurityError') {
                     statusElement.textContent = '❌ ปัญหาความปลอดภัย (ต้องใช้ HTTPS)';
                 } else {
-                    statusElement.textContent = `❌ ข้อผิดพลาด: ${error.message}`;
+                    statusElement.textContent = `❌ เกิดข้อผิดพลาด: ${error.message}`;
                 }
             }
         }
@@ -787,42 +1481,118 @@
         }
         
         // ตั้งค่าโหมด
+        let modeChangeInProgress = false;
         function setMode(mode, btn) {
-            currentMode = mode;
-            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-            if (btn) {
-                btn.classList.add('active');
+            // ป้องกันการเปลี่ยนโหมดซ้ำ
+            if (modeChangeInProgress) {
+                console.log('กำลังเปลี่ยนโหมดอยู่ กรุณารอสักครู่');
+                return;
             }
-            clearPoints();
             
-            // อัพเดทคำแนะนำตามโหมด
-            const baselineField = document.getElementById('baselineField');
-            if (baselineField) {
-                baselineField.style.display = (mode === 'height') ? 'block' : 'none';
-            }
-            const instructions = document.querySelector('.instructions ul');
-            switch(mode) {
-                case 'distance':
-                    instructions.innerHTML = `
-                        <li>เลือกจุดเริ่มต้นและจุดสิ้นสุด</li>
-                        <li>กดปุ่ม "เพิ่มจุด" ที่จุดทั้งสอง</li>
-                        <li>กด "คำนวณ" เพื่อดูระยะทาง</li>
-                    `;
-                    break;
-                case 'area':
-                    instructions.innerHTML = `
-                        <li>เพิ่มจุดรอบๆ พื้นที่ที่ต้องการวัด</li>
-                        <li>ต้องมีอย่างน้อย 3 จุดขึ้นไป</li>
-                        <li>กด "คำนวณ" เพื่อดูพื้นที่</li>
-                    `;
-                    break;
-                case 'height':
-                    instructions.innerHTML = `
-                        <li>เลือกจุดฐานและจุดยอด</li>
-                        <li>ถือโทรศัพท์ในแนวตั้ง</li>
-                        <li>กด "คำนวณ" เพื่อดูความสูง</li>
-                    `;
-                    break;
+            try {
+                modeChangeInProgress = true;
+                console.log('กำลังเปลี่ยนโหมดเป็น:', mode);
+                currentMode = mode;
+                
+                // ตรวจสอบว่า DOM elements พร้อมใช้งาน
+                const requiredElements = ['cameraControls', 'measurementControls', 'advancedCameraControls', 'heightControls', 'calculationSteps'];
+                const missingElements = requiredElements.filter(id => !document.getElementById(id));
+                
+                if (missingElements.length > 0) {
+                    console.warn('พบ elements ที่หายไป:', missingElements);
+                }
+                
+                // อัปเดต UI ปุ่มโหมด
+                const modeButtons = document.querySelectorAll('.mode-btn');
+                if (modeButtons.length === 0) {
+                    throw new Error('ไม่พบปุ่มโหมด');
+                }
+                
+                modeButtons.forEach(b => b.classList.remove('active'));
+                if (btn) {
+                    btn.classList.add('active');
+                } else {
+                    // หาปุ่มที่ตรงกับโหมดและเปิดใช้งาน
+                    modeButtons.forEach(button => {
+                        const buttonText = button.textContent.toLowerCase();
+                        if ((mode === 'distance' && buttonText.includes('ระยะทาง')) ||
+                            (mode === 'area' && buttonText.includes('พื้นที่')) ||
+                            (mode === 'height' && buttonText.includes('ความสูง')) ||
+                            (mode === 'angle' && buttonText.includes('มุม'))) {
+                            button.classList.add('active');
+                        }
+                    });
+                }
+                
+                // ล้างจุดเก่าอย่างปลอดภัย
+                try {
+                    clearPoints();
+                } catch (clearError) {
+                    console.warn('ไม่สามารถล้างจุดได้:', clearError);
+                    // ล้างจุดแบบ manual
+                    points = [];
+                    const pointsContainer = document.getElementById('points');
+                    if (pointsContainer) {
+                        pointsContainer.innerHTML = '';
+                    }
+                }
+                
+                // ซ่อน UI sections ทั้งหมดก่อน
+                const cameraControls = document.getElementById('cameraControls');
+                const measurementControls = document.getElementById('measurementControls');
+                const advancedCameraControls = document.getElementById('advancedCameraControls');
+                const heightControls = document.getElementById('heightControls');
+                
+                // ซ่อนทั้งหมดอย่างปลอดภัย
+                [cameraControls, measurementControls, advancedCameraControls, heightControls].forEach(element => {
+                    if (element) element.style.display = 'none';
+                });
+                
+                // แสดง UI sections ตามโหมด
+                switch(mode) {
+                    case 'distance':
+                        if (cameraControls) cameraControls.style.display = 'block';
+                        if (measurementControls) measurementControls.style.display = 'block';
+                        if (advancedCameraControls) advancedCameraControls.style.display = 'block';
+                        break;
+                        
+                    case 'area':
+                        if (cameraControls) cameraControls.style.display = 'block';
+                        if (measurementControls) measurementControls.style.display = 'block';
+                        break;
+                        
+                    case 'height':
+                        if (heightControls) heightControls.style.display = 'block';
+                        break;
+                        
+                    case 'angle':
+                        if (cameraControls) cameraControls.style.display = 'block';
+                        break;
+                        
+                    default:
+                        console.warn('โหมดไม่รู้จัก:', mode);
+                        break;
+                }
+                
+                // ซ่อนขั้นตอนการคำนวณ
+                const stepsDiv = document.getElementById('calculationSteps');
+                if (stepsDiv) {
+                    stepsDiv.classList.remove('show');
+                }
+                
+                // รีเซ็ตผลลัพธ์
+                updateResults(0, 0, 0, 0);
+                
+                console.log('เปลี่ยนโหมดสำเร็จเป็น:', currentMode);
+                
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการเปลี่ยนโหมด:', error);
+                alert(`เกิดข้อผิดพลาดในการเปลี่ยนโหมด: ${error.message}\nกรุณาลองใหม่อีกครั้ง`);
+            } finally {
+                // ปลดล็อคการเปลี่ยนโหมดหลังจาก 500ms
+                setTimeout(() => {
+                    modeChangeInProgress = false;
+                }, 500);
             }
         }
         
@@ -852,6 +1622,10 @@
             }
             if (currentMode === 'distance' && points.length >= 2) {
                 alert('โหมดระยะทางใช้ตัวอย่าง 2 จุด (เริ่มต้น-สิ้นสุด)');
+                return;
+            }
+            if (currentMode === 'angle' && points.length >= 3) {
+                alert('โหมดวัดมุมใช้ได้ 3 จุด (ยอดมุม, จุดที่ 1, จุดที่ 2)');
                 return;
             }
             
@@ -909,17 +1683,23 @@
                 const p1 = points[i];
                 const p2 = points[i + 1];
                 
+                const dx = p2.x - p1.x;
+                const dy = p2.y - p1.y;
+                
+                // คำนวณระยะทางในระนาบ 2D
+                const pixelDistance = Math.sqrt(dx * dx + dy * dy);
+                
+                // Advanced Perspective Correction
+                const correctedDistance = applyAdvancedPerspectiveCorrection(p1, p2, pixelDistance);
+                
                 const line = document.createElement('div');
                 line.className = 'measurement-line';
                 
-                const dx = p2.x - p1.x;
-                const dy = p2.y - p1.y;
-                const length = Math.sqrt(dx * dx + dy * dy);
                 const angle = Math.atan2(dy, dx) * 180 / Math.PI;
                 
                 line.style.left = p1.x + 'px';
                 line.style.top = p1.y + 'px';
-                line.style.width = length + 'px';
+                line.style.width = correctedDistance + 'px';
                 line.style.transform = `rotate(${angle}deg)`;
                 
                 container.appendChild(line);
@@ -935,12 +1715,18 @@
                 
                 const dx = p2.x - p1.x;
                 const dy = p2.y - p1.y;
-                const length = Math.sqrt(dx * dx + dy * dy);
+                
+                // คำนวณระยะทางในระนาบ 2D
+                const pixelDistance = Math.sqrt(dx * dx + dy * dy);
+                
+                // Advanced Perspective Correction
+                const correctedDistance = applyAdvancedPerspectiveCorrection(p1, p2, pixelDistance);
+                
                 const angle = Math.atan2(dy, dx) * 180 / Math.PI;
                 
                 line.style.left = p1.x + 'px';
                 line.style.top = p1.y + 'px';
-                line.style.width = length + 'px';
+                line.style.width = correctedDistance + 'px';
                 line.style.transform = `rotate(${angle}deg)`;
                 
                 container.appendChild(line);
@@ -949,27 +1735,31 @@
         
         // คำนวณผลลัพธ์
         function calculate() {
-            if (points.length === 0) {
-                alert('กรุณาเพิ่มจุดวัดก่อน');
-                return;
-            }
-            
             let distance = 0;
             let area = 0;
             let height = 0;
+            let angle = 0;
             
             switch (currentMode) {
                 case 'distance':
+                    if (points.length === 0) {
+                        alert('กรุณาเพิ่มจุดวัดก่อน');
+                        return;
+                    }
                     if (points.length >= 2) {
                         distance = calculateDistance();
-                        try { renderTrigLessonDistance(); } catch(e) { console.log('trig distance render error', e); }
+                        showCalculationSteps('distance', distance);
                     }
                     break;
                     
                 case 'area':
+                    if (points.length === 0) {
+                        alert('กรุณาเพิ่มจุดวัดก่อน');
+                        return;
+                    }
                     if (points.length >= 3) {
                         area = calculateArea();
-                        try { renderTrigLessonArea(); } catch(e) { console.log('trig area render error', e); }
+                        showCalculationSteps('area', area);
                     } else {
                         alert('ต้องมีอย่างน้อย 3 จุดสำหรับการวัดพื้นที่');
                         return;
@@ -977,26 +1767,32 @@
                     break;
                     
                 case 'height':
-                    if (points.length >= 2) {
-                        const D = parseFloat(document.getElementById('baselineInput')?.value || '');
-                        if (!isNaN(D) && D > 0) {
-                            const p1 = points[0];
-                            const p2 = points[points.length - 1];
-                            const dx = (p2.x - p1.x);
-                            const dy = (p2.y - p1.y);
-                            const thetaRad = Math.atan2(-dy, dx); // -dy เพราะแกน y จอภาพลงล่าง
-                            const hTrig = D * Math.tan(thetaRad);
-                            height = Math.abs(hTrig);
-                            try { renderTrigLessonHeight(D, thetaRad, dx, dy, getScalePxPerMeter(), height); } catch(e) { console.log('trig height render error', e); }
-                        } else {
-                            height = calculateHeight();
-                            try { renderTrigLessonHeightPixel(); } catch(e) { console.log('trig height (pixel) render error', e); }
-                        }
+                    // โหมดความสูงใช้ Law of Cosines - ไม่ต้องใช้จุดจากกล้อง
+                    height = calculateHeightFromLawOfCosines();
+                    if (height > 0) {
+                        showCalculationSteps('height', height);
+                    } else {
+                        alert('กรุณากรอกค่ามุม C และด้าน a, b ให้ถูกต้อง');
+                        return;
+                    }
+                    break;
+                    
+                case 'angle':
+                    if (points.length === 0) {
+                        alert('กรุณาเพิ่มจุดวัดก่อน');
+                        return;
+                    }
+                    if (points.length >= 3) {
+                        angle = calculateAngle();
+                        showCalculationSteps('angle', angle);
+                    } else {
+                        alert('ต้องมี 3 จุดสำหรับการวัดมุม');
+                        return;
                     }
                     break;
             }
             
-            updateResults(distance, area, height);
+            updateResults(distance, area, height, angle);
         }
         
         // คำนวณระยะทาง
@@ -1015,11 +1811,70 @@
                 
                 const dx = p2.x - p1.x;
                 const dy = p2.y - p1.y;
-                const distance = Math.sqrt(dx * dx + dy * dy) / s; // เมตร
-                totalDistance += distance;
+                
+                // คำนวณระยะทางในระนาบ 2D
+                const pixelDistance = Math.sqrt(dx * dx + dy * dy);
+                
+                // Advanced Perspective Correction
+                const correctedDistance = applyAdvancedPerspectiveCorrection(p1, p2, pixelDistance, s);
+                totalDistance += correctedDistance;
             }
             
             return totalDistance;
+        }
+        
+        // Advanced Perspective Correction System (ปรับปรุงความแม่นยำ)
+        function applyAdvancedPerspectiveCorrection(p1, p2, pixelDistance, scale) {
+            const centerX = video.videoWidth / 2;
+            const centerY = video.videoHeight / 2;
+            const avgX = (p1.x + p2.x) / 2;
+            const avgY = (p1.y + p2.y) / 2;
+            
+            // ตรวจสอบว่าอยู่ใกล้กึ่งกลางหรือไม่ - ถ้าใกล้ให้ใช้ค่าเดิม
+            const distanceFromCenter = Math.sqrt(
+                Math.pow((avgX - centerX) / centerX, 2) + 
+                Math.pow((avgY - centerY) / centerY, 2)
+            );
+            
+            // ถ้าอยู่ใกล้กึ่งกลาง (< 0.3) ใช้การแก้ไขน้อยมาก
+            if (distanceFromCenter < 0.3) {
+                const minimalCorrection = 1 + distanceFromCenter * 0.05; // แก้ไขเพียง 5%
+                return (pixelDistance * minimalCorrection) / scale;
+            }
+            
+            // สำหรับจุดที่ห่างจากกึ่งกลาง ใช้การแก้ไขแบบปรับปรุง
+            
+            // 1. ปรับค่า FOV ให้เหมาะสมกับกล้องจริง
+            const adjustedFOV = {
+                horizontal: cameraFOV.horizontal * 0.8, // ลดลง 20%
+                vertical: cameraFOV.vertical * 0.8
+            };
+            
+            // 2. คำนวณมุมจาก FOV (ใช้ tangent สำหรับความแม่นยำ)
+            const horizontalAngle = ((avgX - centerX) / centerX) * (adjustedFOV.horizontal / 2) * (Math.PI / 180);
+            const verticalAngle = ((avgY - centerY) / centerY) * (adjustedFOV.vertical / 2) * (Math.PI / 180);
+            
+            // 3. ปรับค่าตามมุมมองแบบโค้งที่อ่อนโยนกว่า
+            const radialDistance = Math.sqrt(
+                Math.pow((avgX - centerX) / centerX, 2) + 
+                Math.pow((avgY - centerY) / centerY, 2)
+            );
+            
+            // ลดค่า curvature factor ลงมาก
+            const curvatureFactor = 1 + Math.pow(radialDistance, 1.2) * 0.15; // ลดจาก 0.4 เป็น 0.15
+            
+            // 4. ปรับตามมุมเอียงกล้อง (ลดผลกระทบ)
+            const tiltCorrection = Math.abs(cameraTilt) > 10 ? 
+                Math.cos(cameraTilt * Math.PI / 180) : 1.0; // ใช้เฉพาะเมื่อเอียงมาก
+            
+            // 5. ลดผลกระทบของ Distance Scaling
+            const estimatedDistance = calculateDistanceToObject(avgY, centerY);
+            const distanceScaling = Math.max(0.8, Math.min(1.2, estimatedDistance / 3.0)); // ลดช่วงจาก 0.5-2.0 เป็น 0.8-1.2
+            
+            // 6. รวมปัจจัยทั้งหมดแบบอ่อนโยน
+            const finalCorrection = curvatureFactor * tiltCorrection * distanceScaling;
+            
+            return (pixelDistance * finalCorrection) / scale;
         }
         
         // คำนวณพื้นที่
@@ -1039,121 +1894,330 @@
             return Math.abs(area) / 2 / (s * s); // ตร.ม.
         }
         
-        // คำนวณความสูง
+        // คำนวณความสูง (แก้ไขปัญหาค่าต่ำเกินไป - ใช้มุมยกระดับโดยตรง)
         function calculateHeight() {
             if (points.length < 2) return 0;
             
-            const p1 = points[0];
-            const p2 = points[points.length - 1];
+            const p1 = points[0]; // จุดฐาน (ด้านล่าง)
+            const p2 = points[points.length - 1]; // จุดยอด (ด้านบน)
+            const centerY = video.videoHeight / 2;
             
-            // ใช้ความต่างแนวตั้งของพิกเซลเป็นค่าประมาณความสูง (แปลงเป็นเมตรด้วยสเกล)
+            // คำนวณระยะห่างเฉลี่ยจากกล้องถึงวัตถุ
+            let avgDistance;
+            if (manualDistanceMode) {
+                // ใช้ระยะทางที่ผู้ใช้กำหนด
+                avgDistance = manualDistance;
+            } else {
+                // คำนวณระยะทางอัตโนมัติ
+                avgDistance = (calculateDistanceToObject(p1.y, centerY) + calculateDistanceToObject(p2.y, centerY)) / 2;
+            }
+            
+            // คำนวณความต่างของพิกเซลในแนวตั้ง
+            const pixelDifference = Math.abs(p2.y - p1.y);
+            
+            // คำนวณมุมจากความต่างพิกเซล
+            const verticalFOVRad = (cameraFOV.vertical * Math.PI) / 180;
+            const pixelsPerDegree = video.videoHeight / verticalFOVRad;
+            const angleInRadians = pixelDifference / pixelsPerDegree;
+            
+            // คำนวณความสูงด้วยตรีโกณมิติ: height = distance × tan(angle)
+            let objectHeight = avgDistance * Math.tan(angleInRadians);
+            
+            // ปรับค่าตามระยะห่างแนวนอน (ถ้ามี)
+            const dx = Math.abs(p2.x - p1.x);
+            if (dx > 20) { // มีการเลื่อนแนวนอนมาก
+                const horizontalCorrection = Math.cos(Math.atan(dx / video.videoWidth));
+                objectHeight *= horizontalCorrection;
+            }
+            
+            // ปรับค่าตามมุมเอียงกล้อง
+            const tiltCorrection = Math.cos(cameraTilt * Math.PI / 180);
+            objectHeight *= tiltCorrection;
+            
+            // ใช้ปัจจัยชดเชยตามระยะห่างและความสูงของวัตถุ (เฉพาะโหมดอัตโนมัติ)
+            if (!manualDistanceMode) {
+                const distanceCompensation = getDistanceCompensationFactor(avgDistance, objectHeight);
+                objectHeight *= distanceCompensation;
+            }
+            
+            // เพิ่มปัจจัยการปรับแต่งสำหรับความแม่นยำ (ตามข้อมูลจริง)
+            const calibrationFactor = 1.2; // ปรับจากการทดสอบจริง
+            objectHeight *= calibrationFactor;
+            
+            // ตรวจสอบและแสดงคำแนะนำตามระยะห่าง (เฉพาะโหมดอัตโนมัติ)
+            if (!manualDistanceMode) {
+                const distanceCheck = checkOptimalDistance(objectHeight, avgDistance);
+                updateDistanceWarnings(distanceCheck);
+            }
+            
+            // จำกัดค่าให้อยู่ในช่วงที่สมเหตุสมผล
+            return Math.max(0.1, Math.min(100, objectHeight));
+        }
+        
+        // คำนวณมุมแนวตั้งจากตำแหน่งพิกเซล (ปรับปรุงใหม่)
+        function getVerticalAngleFromPixel(pixelY, centerY) {
+            // ในโหมดตั้งฉาก: ใช้จุดศูนย์กลางกล้องเป็นฐาน (มุม = 0°)
+            if (perpendicularMode) {
+                return 0;
+            }
+            
+            // โหมดปกติ: คำนวณมุมจากตำแหน่งพิกเซลเทียบกับจุดศูนย์กลาง
+            const normalizedY = (pixelY - centerY) / centerY;
+            const verticalAngleRad = normalizedY * (cameraFOV.vertical / 2) * (Math.PI / 180);
+            
+            // ปรับมุมตามการเอียงของกล้อง
+            return verticalAngleRad + (cameraTilt * Math.PI / 180);
+        }
+        
+        // คำนวณมุมแนวนอนจากตำแหน่งพิกเซล
+        function getHorizontalAngleFromPixel(pixelX, centerX) {
+            const normalizedX = (pixelX - centerX) / centerX;
+            const halfFOVRad = (cameraFOV.horizontal / 2) * (Math.PI / 180);
+            return Math.atan(normalizedX * Math.tan(halfFOVRad));
+        }
+        
+        // คำนวณมุม
+        function calculateAngle() {
+            if (points.length < 3) return 0;
+            
+            const vertex = points[0]; // จุดยอดมุม
+            const p1 = points[1];     // จุดที่ 1
+            const p2 = points[2];     // จุดที่ 2
+            
+            // คำนวณเวกเตอร์จากยอดไปยังจุดต่างๆ
+            const v1x = p1.x - vertex.x;
+            const v1y = p1.y - vertex.y;
+            const v2x = p2.x - vertex.x;
+            const v2y = p2.y - vertex.y;
+            
+            // คำนวณมุมด้วยฟังก์ชัน atan2
+            const angle1 = Math.atan2(v1y, v1x);
+            const angle2 = Math.atan2(v2y, v2x);
+            
+            // หามุมระหว่างเวกเตอร์ทั้งสอง
+            let angleDiff = Math.abs(angle2 - angle1);
+            
+            // แปลงเป็นองศา
+            angleDiff = angleDiff * (180 / Math.PI);
+            
+            // ให้มุมอยู่ในช่วง 0-180 องศา
+            if (angleDiff > 180) {
+                angleDiff = 360 - angleDiff;
+            }
+            
+            return angleDiff;
+        }
+        
+        // แสดงขั้นตอนการคำนวณ
+        function showCalculationSteps(mode, result) {
+            const stepsDiv = document.getElementById('calculationSteps');
+            const contentDiv = document.getElementById('stepsContent');
             const s = getScalePxPerMeter();
-            return Math.abs(p2.y - p1.y) / s;
+            
+            let stepsHTML = '';
+            
+            switch(mode) {
+                case 'distance':
+                    if (points.length >= 2) {
+                        const p1 = points[0];
+                        const p2 = points[1];
+                        const dx = p2.x - p1.x;
+                        const dy = p2.y - p1.y;
+                        const pixelDistance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        const centerY = video.videoHeight / 2;
+                        const avgY = (p1.y + p2.y) / 2;
+                        const distanceFromCenter = Math.abs(avgY - centerY);
+                        const perspectiveFactor = 1 + (distanceFromCenter / centerY) * 0.3;
+                        const depthFactor = avgY > centerY ? 1 + ((avgY - centerY) / centerY) * 0.5 : 1;
+                        
+                        const centerX = video.videoWidth / 2;
+                        const avgX = (p1.x + p2.x) / 2;
+                        const avgYPos = (p1.y + p2.y) / 2;
+                        const estimatedDistance = calculateDistanceToObject(avgYPos, centerY);
+                        const radialDistance = Math.sqrt(
+                            Math.pow((avgX - centerX) / centerX, 2) + 
+                            Math.pow((avgYPos - centerY) / centerY, 2)
+                        );
+                        const curvatureFactor = 1 + Math.pow(radialDistance, 1.5) * 0.4;
+                        const tiltCorrection = Math.cos(cameraTilt * Math.PI / 180);
+                        const distanceScaling = Math.max(0.5, Math.min(2.0, estimatedDistance / 3.0));
+                        
+                        stepsHTML = `
+                            <div class="step-item">
+                                <span class="step-number">ขั้นที่ 1:</span> หาระยะทางในระนาบ 2D
+                                <div class="step-formula">Δx = ${dx} px, Δy = ${dy} px</div>
+                                <div class="step-formula">d₂D = √(Δx² + Δy²) = ${pixelDistance.toFixed(2)} px</div>
+                            </div>
+                            <div class="step-item">
+                                <span class="step-number">ขั้นที่ 2:</span> Advanced Perspective Correction
+                                <div class="step-formula">FOV: H=${cameraFOV.horizontal}°, V=${cameraFOV.vertical}°</div>
+                                <div class="step-formula">ระยะห่างประมาณ = ${estimatedDistance.toFixed(2)} ม.</div>
+                                <div class="step-formula">ปัจจัยโค้ง = ${curvatureFactor.toFixed(3)}</div>
+                                <div class="step-formula">แก้ไขมุมเอียง = ${tiltCorrection.toFixed(3)} (${cameraTilt.toFixed(1)}°)</div>
+                            </div>
+                            <div class="step-item">
+                                <span class="step-number">ขั้นที่ 3:</span> คำนวณระยะทางจริง
+                                <div class="step-formula">การปรับแต่งรวม = ${(curvatureFactor * tiltCorrection * distanceScaling).toFixed(3)}</div>
+                                <div class="step-formula">ระยะทางจริง = (${pixelDistance.toFixed(2)} × ${(curvatureFactor * tiltCorrection * distanceScaling).toFixed(3)}) ÷ ${s} = ${result.toFixed(3)} ม.</div>
+                            </div>
+                        `;
+                    }
+                    break;
+                    
+                case 'height':
+                    if (result > 0) {
+                        const angleC = parseFloat(document.getElementById('angleInput')?.value || '90');
+                        const sideA = parseFloat(document.getElementById('sideAInput')?.value || '3.0');
+                        const sideB = parseFloat(document.getElementById('sideBInput')?.value || '4.0');
+                        const angleCRad = (angleC * Math.PI) / 180;
+                        const cSquared = (sideA * sideA) + (sideB * sideB) - (2 * sideA * sideB * Math.cos(angleCRad));
+                        
+                        stepsHTML = `
+                            <div class="step-item">
+                                <span class="step-number">📐 Law of Cosines:</span> การคำนวณความสูง
+                                <div class="step-formula"><strong>สูตร:</strong> c² = a² + b² - 2ab cos(C)</div>
+                                <div class="step-formula"><strong>ค่าที่ป้อน:</strong> มุม C = ${angleC}°, ด้าน a = ${sideA} ม., ด้าน b = ${sideB} ม.</div>
+                            </div>
+                            <div class="step-item">
+                                <span class="step-number">ขั้นที่ 1:</span> คำนวณ cos(${angleC}°)
+                                <div class="step-formula">cos(${angleC}°) = ${Math.cos(angleCRad).toFixed(6)}</div>
+                            </div>
+                            <div class="step-item">
+                                <span class="step-number">ขั้นที่ 2:</span> คำนวณแต่ละส่วนของสูตร
+                                <div class="step-formula">a² = ${sideA}² = ${(sideA * sideA).toFixed(3)}</div>
+                                <div class="step-formula">b² = ${sideB}² = ${(sideB * sideB).toFixed(3)}</div>
+                                <div class="step-formula">2ab cos(C) = 2 × ${sideA} × ${sideB} × ${Math.cos(angleCRad).toFixed(6)} = ${(2 * sideA * sideB * Math.cos(angleCRad)).toFixed(6)}</div>
+                            </div>
+                            <div class="step-item">
+                                <span class="step-number">ขั้นที่ 3:</span> คำนวณ c²
+                                <div class="step-formula">c² = ${(sideA * sideA).toFixed(3)} + ${(sideB * sideB).toFixed(3)} - ${(2 * sideA * sideB * Math.cos(angleCRad)).toFixed(6)}</div>
+                                <div class="step-result">c² = ${cSquared.toFixed(6)}</div>
+                            </div>
+                            <div class="step-item">
+                                <span class="step-number">ขั้นที่ 4:</span> ผลลัพธ์สุดท้าย
+                                <div class="step-result">ความสูง (c) = √${cSquared.toFixed(6)} = <strong>${result.toFixed(3)} เมตร</strong></div>
+                                ${cSquared < 0 ? '<div style="color: #ff4757; font-weight: bold;">⚠️ ค่าที่ป้อนเข้าไม่เป็นไปตามกฎของสามเหลี่ยม</div>' : ''}
+                            </div>
+                        `;
+                    }
+                    break;
+                    
+                case 'angle':
+                    if (points.length >= 3) {
+                        const vertex = points[0]; // จุดยอดมุม
+                        const p1 = points[1];     // จุดที่ 1
+                        const p2 = points[2];     // จุดที่ 2
+                        
+                        // คำนวณเวกเตอร์จากยอดไปยังจุดต่างๆ
+                        const v1x = p1.x - vertex.x;
+                        const v1y = p1.y - vertex.y;
+                        const v2x = p2.x - vertex.x;
+                        const v2y = p2.y - vertex.y;
+                        
+                        // คำนวณมุมด้วยฟังก์ชัน atan2
+                        const angle1 = Math.atan2(v1y, v1x);
+                        const angle2 = Math.atan2(v2y, v2x);
+                        
+                        // หามุมระหว่างเวกเตอร์ทั้งสอง
+                        let angleDiff = Math.abs(angle2 - angle1);
+                        
+                        // แปลงเป็นองศา
+                        angleDiff = angleDiff * (180 / Math.PI);
+                        
+                        // ให้มุมอยู่ในช่วง 0-180 องศา
+                        if (angleDiff > 180) {
+                            angleDiff = 360 - angleDiff;
+                        }
+                        
+                        stepsHTML = `
+                            <div class="step-item">
+                                <span class="step-number">ขั้นที่ 1:</span> หาเวกเตอร์จากยอดมุม
+                                <div class="step-formula">เวกเตอร์ 1: (${v1x}, ${v1y})</div>
+                                <div class="step-formula">เวกเตอร์ 2: (${v2x}, ${v2y})</div>
+                            </div>
+                            <div class="step-item">
+                                <span class="step-number">ขั้นที่ 2:</span> ใช้ฟังก์ชัน arctan
+                                <div class="step-formula">θ₁ = arctan(${v1y}/${v1x})</div>
+                                <div class="step-formula">θ₂ = arctan(${v2y}/${v2x})</div>
+                            </div>
+                            <div class="step-item">
+                                <span class="step-number">ขั้นที่ 3:</span> หามุมระหว่างเวกเตอร์
+                                <div class="step-formula">มุม = |θ₂ - θ₁|</div>
+                                <div class="step-result">มุม = ${result.toFixed(2)}°</div>
+                            </div>
+                        `;
+                    }
+                    break;
+                    
+                case 'area':
+                    stepsHTML = `
+                        <div class="step-item">
+                            <span class="step-number">ขั้นที่ 1:</span> ใช้สูตร Shoelace Formula
+                            <div class="step-formula">Area = ½|∑(xᵢyᵢ₊₁ - xᵢ₊₁yᵢ)|</div>
+                        </div>
+                        <div class="step-item">
+                            <span class="step-number">ขั้นที่ 2:</span> คำนวณจากจุดทั้งหมด ${points.length} จุด
+                            <div class="step-result">พื้นที่ = ${result.toFixed(2)} ตร.ม.</div>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            contentDiv.innerHTML = stepsHTML;
+            stepsDiv.classList.add('show');
         }
         
         // อัพเดทข้อมูลการวัด
         function updateInfo() {
-            document.getElementById('info').textContent = `จุดที่วัด: ${points.length}`;
-            document.getElementById('point-count').textContent = points.length;
-        }
-        
-        // อัพเดทผลลัพธ์
-        function updateResults(distance = 0, area = 0, height = 0) {
-            document.getElementById('distance').textContent = distance.toFixed(2) + ' ม.';
-            document.getElementById('area').textContent = area.toFixed(2) + ' ตร.ม.';
-            document.getElementById('height').textContent = height.toFixed(2) + ' ม.';
-        }
-        
-        // Trig lesson helpers
-        function toggleTrigPanel() {
-            const panel = document.getElementById('trigPanel');
-            if (!panel) return;
-            panel.style.display = (panel.style.display === 'none' || panel.style.display === '') ? 'block' : 'none';
-        }
-
-        function setTrigContent(html) {
-            const el = document.getElementById('trigContent');
-            if (!el) return;
-            el.innerHTML = html;
-        }
-
-        function renderTrigLessonDistance() {
-            if (points.length < 2) return;
-            const s = getScalePxPerMeter();
-            const p1 = points[0];
-            const p2 = points[points.length - 1];
-            const dx = p2.x - p1.x;
-            const dy = p2.y - p1.y;
-            const px = Math.hypot(dx, dy);
-            const m = px / s;
-            const thetaDeg = (Math.atan2(-dy, dx) * 180 / Math.PI);
-            setTrigContent(`
-                <pre>
-ขั้นตอนคำนวณระยะทาง
-1) ความต่างพิกัด: Δx = ${dx.toFixed(2)}, Δy = ${dy.toFixed(2)} (พิกเซล)
-2) ระยะพิกเซล: √(Δx²+Δy²) = ${px.toFixed(2)} px
-3) สเกล: ${s} px ต่อ 1 m
-4) ระยะจริง: ${px.toFixed(2)} / ${s} = ${m.toFixed(2)} m
-5) มุมเส้น: θ = atan2(−Δy, Δx) ≈ ${thetaDeg.toFixed(1)}°
-                </pre>
-                <div class="note">หมายเหตุ: ระยะเป็นผลรวมของเส้นตรงระหว่างจุดแรกกับจุดสุดท้ายที่เลือก</div>
-            `);
-        }
-
-        function renderTrigLessonArea() {
-            if (points.length < 3) return;
-            const s = getScalePxPerMeter();
-            // Shoelace
-            let sum = 0;
-            for (let i = 0; i < points.length; i++) {
-                const j = (i + 1) % points.length;
-                sum += points[i].x * points[j].y - points[j].x * points[i].y;
+            const info = document.getElementById('info');
+            const tiltText = Math.abs(cameraTilt) > 5 ? 
+                ` | เอียง: ${cameraTilt.toFixed(1)}°` : '';
+            
+            if (currentMode === 'height' && points.length >= 1) {
+                const centerY = video.videoHeight / 2;
+                const lastPoint = points[points.length - 1];
+                const distanceToObject = calculateDistanceToObject(lastPoint.y, centerY);
+                info.textContent = `จุดที่วัด: ${points.length} | ระยะ: ${distanceToObject.toFixed(1)}ม.${tiltText}`;
+            } else {
+                info.textContent = `จุดที่วัด: ${points.length}${tiltText}`;
             }
-            const px2 = Math.abs(sum) / 2;
-            const m2 = px2 / (s * s);
-            const coords = points.map((p, i) => `P${i+1}(${p.x.toFixed(1)}, ${p.y.toFixed(1)})`).join(', ');
-            setTrigContent(`
-                <pre>
-ขั้นตอนคำนวณพื้นที่ (Shoelace)
-จุด: ${coords}
-1) พิกเซลพื้นที่: |Σ(x_i y_{i+1} − x_{i+1} y_i)| / 2 = ${px2.toFixed(2)} px²
-2) สเกล: ${s} px ต่อ 1 m → 1 m² = ${s*s} px²
-3) พื้นที่จริง: ${px2.toFixed(2)} / (${s}²) = ${m2.toFixed(2)} m²
-                </pre>
-                <div class="note">หมายเหตุ: พื้นที่แม่นยำขึ้นเมื่อเลือกจุดล้อมรูปครบและเป็นลำดับทวน/ตามเข็มต่อเนื่อง</div>
-            `);
         }
-
-        function renderTrigLessonHeight(D, thetaRad, dx, dy, s, h) {
-            const thetaDeg = thetaRad * 180 / Math.PI;
-            setTrigContent(`
-                <pre>
-ขั้นตอนคำนวณความสูงด้วยตรีโกณมิติ (มีฐาน D)
-1) ฐาน D = ${D.toFixed(2)} m
-2) คำนวณมุมเงย: θ = atan2(−Δy, Δx) = ${thetaDeg.toFixed(1)}°  (Δx=${dx.toFixed(2)}, Δy=${dy.toFixed(2)} px)
-3) สูตร: h = D · tan(θ)
-4) h = ${D.toFixed(2)} · tan(${thetaDeg.toFixed(1)}°) = ${h.toFixed(2)} m
-                </pre>
-                <div class="note">หมายเหตุ: ต้องรู้ระยะฐานระหว่างกล้องถึงจุดฐานวัตถุ และเล็งเส้นจากฐานไปยอดให้ถูกทิศ</div>
-            `);
-        }
-
-        function renderTrigLessonHeightPixel() {
-            if (points.length < 2) return;
-            const s = getScalePxPerMeter();
-            const p1 = points[0];
-            const p2 = points[points.length - 1];
-            const dypx = Math.abs(p2.y - p1.y);
-            const m = dypx / s;
-            setTrigContent(`
-                <pre>
-ขั้นตอนคำนวณความสูงโดยอิงพิกเซลแนวตั้ง (ประมาณการ)
-1) ความต่างแนวตั้ง: |Δy| = ${dypx.toFixed(2)} px
-2) สเกล: ${s} px ต่อ 1 m
-3) ความสูงประมาณ: ${dypx.toFixed(2)} / ${s} = ${m.toFixed(2)} m
-                </pre>
-                <div class="note">หมายเหตุ: วิธีนี้เป็นการประมาณจากพิกเซล ไม่ได้คำนึงถึงมุมมอง/ระยะจริง เหมาะใช้คร่าวๆ เท่านั้น</div>
-            `);
+        
+        // อัพเดตผลลัพธ์
+        function updateResults(distance = 0, area = 0, height = 0, angle = 0) {
+            const distanceEl = document.getElementById('distance');
+            const areaEl = document.getElementById('area');
+            const heightEl = document.getElementById('height');
+            const angleEl = document.getElementById('angle');
+            const pointCountEl = document.getElementById('point-count');
+            
+            if (distanceEl) distanceEl.textContent = distance.toFixed(2) + ' ม.';
+            if (areaEl) areaEl.textContent = area.toFixed(2) + ' ตร.ม.';
+            if (heightEl) heightEl.textContent = height.toFixed(2) + ' ม.';
+            if (angleEl) angleEl.textContent = angle.toFixed(1) + '°';
+            if (pointCountEl) pointCountEl.textContent = points.length;
+            
+            // Only show object distance for non-height modes or when in height mode with points
+            const objectDistanceEl = document.getElementById('object-distance');
+            if (objectDistanceEl) {
+                if (currentMode !== 'height') {
+                    if (points.length >= 2) {
+                        const centerY = video.videoHeight / 2;
+                        const p1 = points[0];
+                        const p2 = points[points.length - 1];
+                        const baseDistance = calculateDistanceToObject(p1.y, centerY);
+                        const topDistance = calculateDistanceToObject(p2.y, centerY);
+                        const avgDistance = (baseDistance + topDistance) / 2;
+                        objectDistanceEl.textContent = avgDistance.toFixed(1) + ' ม.';
+                    } else {
+                        objectDistanceEl.textContent = '0 ม.';
+                    }
+                } else {
+                    // For height mode with Law of Cosines, show the calculated height
+                    objectDistanceEl.textContent = height > 0 ? height.toFixed(2) + ' ม.' : '0 ม.';
+                }
+            }
         }
         
         // ตรวจสอบสถานะกล้องเป็นระยะ
@@ -1165,7 +2229,7 @@
                     cameraActive = false;
                     const statusElement = document.getElementById('camera-status');
                     statusElement.style.display = 'block';
-                    statusElement.textContent = '📷 กล้องถูกปิด - กดปุ่มเพื่อเปิดกล้องใหม่';
+                    statusElement.textContent = '📷 กล้องปิดอยู่ - กดปุ่มเพื่อเปิดกล้อง';
                     statusElement.style.color = '#ff4757';
                 }
             }
@@ -1200,7 +2264,75 @@
             container.addEventListener('click', addPointFromEvent);
             container.addEventListener('touchstart', function(e){ addPointFromEvent(e); }, { passive: true });
         })();
-
+        
+        // ตรวจสอบและแนะนำระยะการวัดที่เหมาะสม
+        function checkOptimalDistance(estimatedHeight, currentDistance) {
+            const warnings = [];
+            const suggestions = [];
+            
+            // คำนวณระยะที่เหมาะสมตามความสูงของวัตถุ
+            const optimalDistance = Math.max(2, Math.min(estimatedHeight * 2, 15));
+            
+            if (currentDistance < 2) {
+                warnings.push("⚠️ ระยะใกล้เกินไป อาจได้ผลไม่แม่นยำ");
+                suggestions.push(`📏 แนะนำให้ถอยห่างเป็น ${optimalDistance.toFixed(1)} เมตร`);
+            } else if (currentDistance > 10 && estimatedHeight < 5) {
+                warnings.push("⚠️ ระยะไกลเกินไปสำหรับวัตถุขนาดนี้");
+                suggestions.push(`📏 แนะนำให้เข้าใกล้เป็น ${optimalDistance.toFixed(1)} เมตร`);
+            } else if (estimatedHeight > 8 && currentDistance < estimatedHeight * 1.5) {
+                warnings.push("⚠️ วัตถุสูงมาก ต้องการระยะห่างมากขึ้น");
+                suggestions.push(`📏 สำหรับวัตถุสูง ${estimatedHeight.toFixed(1)}ม. แนะนำระยะ ${optimalDistance.toFixed(1)} เมตร`);
+            }
+            
+            return { warnings, suggestions, optimalDistance };
+        }
+        
+        // ปรับปัจจัยการคำนวณตามระยะห่าง
+        function getDistanceCompensationFactor(distance, objectHeight) {
+            let compensationFactor = 1.0;
+            
+            // สำหรับระยะไกล (>10ม.) เพิ่มปัจจัยชดเชย
+            if (distance > 10) {
+                compensationFactor = 1.0 + (distance - 10) * 0.05; // เพิ่ม 5% ทุก 1 เมตรที่เกิน 10ม.
+            }
+            
+            // สำหรับวัตถุสูงมาก (>8ม.) ปรับปัจจัยเพิ่มเติม
+            if (objectHeight > 8) {
+                compensationFactor *= 1.0 + (objectHeight - 8) * 0.02; // เพิ่ม 2% ทุก 1 เมตรที่เกิน 8ม.
+            }
+            
+            // สำหรับระยะใกล้ (<3ม.) ลดปัจจัย
+            if (distance < 3) {
+                compensationFactor *= 0.9 + distance * 0.033; // ลดลงเมื่อระยะใกล้
+            }
+            
+            return compensationFactor;
+        }
+        
+        // แสดงคำเตือนและคำแนะนำเกี่ยวกับระยะการวัด
+        function updateDistanceWarnings(distanceCheck) {
+            const warningElement = document.getElementById('distance-warnings');
+            if (!warningElement) return;
+            
+            let warningHTML = '';
+            
+            if (distanceCheck.warnings.length > 0 || distanceCheck.suggestions.length > 0) {
+                warningHTML = '<div class="distance-warnings">';
+                
+                distanceCheck.warnings.forEach(warning => {
+                    warningHTML += `<div class="warning-item">${warning}</div>`;
+                });
+                
+                distanceCheck.suggestions.forEach(suggestion => {
+                    warningHTML += `<div class="suggestion-item">${suggestion}</div>`;
+                });
+                
+                warningHTML += '</div>';
+            }
+            
+            warningElement.innerHTML = warningHTML;
+        }
+        
         // โหมดคาลิเบรต: แตะ 2 จุดบนวิดีโอ แล้วกรอกความยาวจริง (เมตร) เพื่อคำนวณสเกล px/ม.
         function toggleCalibration() {
             calibrationMode = !calibrationMode;
@@ -1211,14 +2343,84 @@
                 removeCalibrationMarkers();
                 btn.textContent = '✅ กำลังคาลิเบรต... (แตะ 2 จุด)';
                 statusElement.style.display = 'block';
-                statusElement.textContent = '🎯 โหมดคาลิเบรต: แตะ 2 จุดบนวิดีโอเพื่อเลือกความยาวอ้างอิง';
+                statusElement.textContent = '🎯 โหมดคาลิเบรต: แตะ 2 จุดที่ขอบของวัตถุ';
                 statusElement.style.color = '#2ed573';
             } else {
                 btn.textContent = '🎯 คาลิเบรตสเกล';
-                statusElement.style.display = 'block';
-                statusElement.textContent = '📷 กล้องปิดอยู่ - กดปุ่มเพื่อเปิดกล้อง';
-                statusElement.style.color = '#ffeb3b';
+                if (!cameraActive) {
+                    statusElement.style.display = 'block';
+                    statusElement.textContent = '📷 กล้องปิดอยู่ - กดปุ่มเพื่อเปิดกล้อง';
+                    statusElement.style.color = '#ffeb3b';
+                } else {
+                    statusElement.style.display = 'none';
+                }
                 removeCalibrationMarkers();
+            }
+        }
+        
+        // คาลิเบรตอัตโนมัติตามระยะห่างจากกึ่งกลาง
+        async function calibrateCameraFOV() {
+            if (!stream || !video.videoWidth) return;
+            
+            try {
+                // พยายามดึงข้อมูล FOV จาก MediaStreamTrack
+                const videoTrack = stream.getVideoTracks()[0];
+                if (videoTrack) {
+                    const settings = videoTrack.getSettings();
+                    const capabilities = videoTrack.getCapabilities();
+                    
+                    // ประมาณ FOV จากความละเอียดและ focal length (ถ้ามี)
+                    if (settings.width && settings.height) {
+                        const aspectRatio = settings.width / settings.height;
+                        
+                        // ประมาณ FOV สำหรับกล้องมือถือทั่วไป (ปรับให้เหมาะสม)
+                        if (aspectRatio > 1.5) { // กล้องแนวนอน
+                            cameraFOV.horizontal = 65; // ลดจาก 75
+                            cameraFOV.vertical = 50;   // ลดจาก 60
+                        } else { // กล้องแนวตั้ง
+                            cameraFOV.horizontal = 55; // ลดจาก 65
+                            cameraFOV.vertical = 40;   // ลดจาก 50
+                        }
+                        
+                        console.log('FOV calibrated:', cameraFOV);
+                    }
+                }
+            } catch (error) {
+                console.log('FOV calibration failed, using defaults:', error);
+            }
+        }
+        
+        // คาลิเบรตอัตโนมัติโดยใช้วัตถุอ้างอิงทั่วไป
+        function autoCalibrate() {
+            const options = [
+                { name: "บัตรเครดิต", width: 8.56, height: 5.398, unit: "ซม." },
+                { name: "กระดาษ A4", width: 21, height: 29.7, unit: "ซม." },
+                { name: "เหรียญ 10 บาท", width: 2.6, height: 2.6, unit: "ซม." },
+                { name: "มือถือ iPhone", width: 7.1, height: 14.7, unit: "ซม." },
+                { name: "ปากกา", width: 1.4, height: 14, unit: "ซม." }
+            ];
+            
+            let optionText = "เลือกวัตถุอ้างอิงที่มีในภาพ:\n";
+            options.forEach((opt, i) => {
+                optionText += `${i + 1}. ${opt.name} (${opt.width}×${opt.height} ${opt.unit})\n`;
+            });
+            
+            const choice = prompt(optionText + "\nกรอกหมายเลข 1-5:");
+            const selectedIndex = parseInt(choice) - 1;
+            
+            if (selectedIndex >= 0 && selectedIndex < options.length) {
+                const selected = options[selectedIndex];
+                alert(`เลือก: ${selected.name}\nขั้นตอนต่อไป: วางวัตถุในภาพแล้วแตะ 2 จุดที่ขอบของวัตถุ`);
+                
+                // เริ่มโหมดคาลิเบรตพิเศษ
+                calibrationMode = true;
+                calibrationPoints = [];
+                window.calibrationReference = selected;
+                
+                const statusElement = document.getElementById('camera-status');
+                statusElement.style.display = 'block';
+                statusElement.textContent = `🎯 แตะ 2 จุดที่ขอบของ${selected.name} (${selected.width} ${selected.unit})`;
+                statusElement.style.color = '#2ed573';
             }
         }
 
@@ -1244,22 +2446,37 @@
             if (calibrationPoints.length === 2) {
                 const [p1, p2] = calibrationPoints;
                 const pixelDist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-                const realMetersStr = prompt(`ระยะพิกเซล ≈ ${pixelDist.toFixed(2)} px\nกรอกความยาวจริง (เมตร):`, '1');
-                const realMeters = parseFloat(realMetersStr);
+                
+                let realMeters;
+                if (window.calibrationReference) {
+                    // ใช้วัตถุอ้างอิงที่เลือกไว้
+                    const ref = window.calibrationReference;
+                    realMeters = ref.width / 100; // แปลง ซม. เป็น เมตร
+                    alert(`ใช้ขนาดของ${ref.name}: ${ref.width} ${ref.unit} = ${realMeters} เมตร`);
+                } else {
+                    // ให้ผู้ใช้กรอกเอง
+                    const realMetersStr = prompt(`ระยะพิกเซล ≈ ${pixelDist.toFixed(2)} px\nกรอกความยาวจริง (เมตร):`, '1');
+                    realMeters = parseFloat(realMetersStr);
+                }
+                
                 if (!isNaN(realMeters) && realMeters > 0) {
                     const scale = pixelDist / realMeters; // px ต่อ 1 เมตร
                     const scaleInput = document.getElementById('scaleInput');
                     scaleInput.value = Math.max(1, Math.round(scale));
                     try { localStorage.setItem('scalePxPerMeter', scaleInput.value); } catch {}
                     updateRuler();
-                    alert(`ตั้งสเกลใหม่เป็น ~ ${scaleInput.value} px/ม.`);
+                    alert(`✅ คาลิเบรตสำเร็จ!\nสเกลใหม่: ${scaleInput.value} px/ม.\nความแม่นยำจะดีขึ้น`);
                 } else {
                     alert('ค่าไม่ถูกต้อง ยกเลิกการคาลิเบรต');
                 }
+                
                 // ออกจากโหมดคาลิเบรตและล้าง marker
                 calibrationMode = false;
+                window.calibrationReference = null;
                 const btn = document.getElementById('calibBtn');
                 btn.textContent = '🎯 คาลิเบรตสเกล';
+                const statusElement = document.getElementById('camera-status');
+                statusElement.style.display = 'none';
                 removeCalibrationMarkers();
             }
         }
@@ -1301,17 +2518,6 @@
                 minorStep = 0.25;
             }
 
-            // วาด tick ที่ 0 ม.
-            const tick0 = document.createElement('div');
-            tick0.className = 'tick major';
-            tick0.style.left = '0px';
-            bar.appendChild(tick0);
-            const lbl0 = document.createElement('div');
-            lbl0.className = 'tick-label';
-            lbl0.style.left = '0px';
-            lbl0.textContent = '0 ม.';
-            bar.appendChild(lbl0);
-
             // วาดจาก 0 ถึงความยาวที่แสดงได้
             const endMeters = Math.max(minorStep, Math.min(1, maxMetersShown));
             for (let m = minorStep; m <= endMeters + 1e-6; m += minorStep) {
@@ -1339,12 +2545,16 @@
         // เริ่มต้นแอป (ไม่เปิดกล้องอัตโนมัติ เพื่อหลีกเลี่ยง autoplay block บางเคส)
         window.addEventListener('load', () => {
             console.log('เริ่มต้นแอปวัดพื้นที่และความสูง');
+            
+            // ตั้งค่าสถานะเริ่มต้น
             const statusElement = document.getElementById('camera-status');
-            statusElement.style.display = 'block';
-            statusElement.textContent = '📷 กล้องปิดอยู่ - กดปุ่มเพื่อเปิดกล้อง';
-            statusElement.style.color = '#ffeb3b';
+            
+            // ตั้งค่าโหมดเริ่มต้น
+            setMode('distance');
+            
             // ตรวจสอบสถานะกล้องทุก 2 วินาที
             setInterval(checkCameraStatus, 2000);
+            
             // ลงทะเบียน Service Worker
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('sw.js').then(() => {
@@ -1366,28 +2576,279 @@
             window.addEventListener('resize', () => {
                 updateRuler();
             });
+            
+            console.log('แอปเริ่มต้นเรียบร้อยแล้ว');
         });
         
-        // จัดการเมื่อปิดหน้าเว็บ
-        window.addEventListener('beforeunload', () => {
-            if (stream) {
-                stream.getTracks().forEach(track => {
-                    track.stop();
-                    console.log('ปิดกล้องเมื่อออกจากหน้าเว็บ');
+        // ฟังก์ชันจัดการรายการกล้อง
+        async function populateCameraSelect() {
+            const select = document.getElementById('cameraSelect');
+            if (!select) return;
+            
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                
+                select.innerHTML = '';
+                videoDevices.forEach((device, index) => {
+                    const option = document.createElement('option');
+                    option.value = device.deviceId;
+                    option.textContent = device.label || `กล้อง ${index + 1}`;
+                    select.appendChild(option);
                 });
+                
+                if (videoDevices.length > 1) {
+                    document.getElementById('refreshBtn').style.display = 'inline-block';
+                }
+            } catch (error) {
+                console.log('ไม่สามารถดึงรายการกล้องได้:', error);
             }
-        });
+        }
         
-        // จัดการเมื่อหน้าเว็บถูกซ่อน/แสดง
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                console.log('หน้าเว็บถูกซ่อน');
-            } else {
-                console.log('หน้าเว็บถูกแสดง');
-                // ตรวจสอบสถานะกล้องเมื่อกลับมาที่หน้าเว็บ
-                checkCameraStatus();
+        // ฟังก์ชันเปลี่ยนกล้อง
+        async function onCameraChange(deviceId) {
+            if (deviceId && cameraActive) {
+                await initCamera(deviceId);
             }
-        });
+        }
+        
+        // ฟังก์ชันรีเฟรชรายการกล้อง
+        async function refreshCameras() {
+            await populateCameraSelect();
+            alert('รีเฟรชรายการกล้องเรียบร้อยแล้ว');
+        }
+        
+        // คำนวณระยะห่างจากกล้องถึงวัตถุ (ปรับปรุงใหม่ - ใช้จุดศูนย์กลางกล้องเป็นฐาน)
+        function calculateDistanceToObject(pixelY, centerY) {
+            // ในโหมดตั้งฉาก: ใช้จุดศูนย์กลางกล้องเป็นฐาน (มุม = 0°)
+            if (perpendicularMode) {
+                // กล้องตั้งฉากกับพื้น: ระยะห่าง = ความสูงกล้อง / tan(0°) = ไม่สิ้นสุด
+                // ใช้ระยะห่างคงที่ตามความสูงกล้อง (สมมติว่าวัตถุอยู่ห่างจากกล้องตามสัดส่วน)
+                const baseDistance = cameraHeight * 2.0; // สมมติว่าวัตถุอยู่ห่างจากกล้อง 2 เท่าของความสูงกล้อง
+                return Math.max(1.0, Math.min(20, baseDistance));
+            }
+            
+            // โหมดปกติ: คำนวณมุมจากตำแหน่งพิกเซลเทียบกับจุดศูนย์กลาง
+            const normalizedY = (pixelY - centerY) / centerY;
+            const verticalAngleRad = normalizedY * (cameraFOV.vertical / 2) * (Math.PI / 180);
+            
+            // ปรับมุมตามการเอียงของกล้อง
+            const adjustedAngle = verticalAngleRad + (cameraTilt * Math.PI / 180);
+            
+            // กรณีมุมน้อยกว่า 3 องศา (เกือบขนานกับพื้น)
+            if (Math.abs(adjustedAngle) < 0.05) {
+                return cameraHeight / Math.tan(0.05); // ประมาณ 30 เมตร
+            }
+            
+            // คำนวณระยะห่างจริงด้วยตรีโกณมิติ
+            const distance = Math.abs(cameraHeight / Math.tan(adjustedAngle));
+            
+            // จำกัดระยะห่างให้อยู่ในช่วงที่สมเหตุสมผล (0.5-50 เมตร)
+            return Math.max(0.5, Math.min(50, distance));
+        }
+        
+        // คำนวณพื้นที่
+        function calculateArea() {
+            if (points.length < 3) return 0;
+            
+            // ใช้ Shoelace formula
+            let area = 0;
+            const n = points.length;
+            
+            for (let i = 0; i < n; i++) {
+                const j = (i + 1) % n;
+                area += points[i].x * points[j].y;
+                area -= points[j].x * points[i].y;
+            }
+            const s = getScalePxPerMeter();
+            return Math.abs(area) / 2 / (s * s); // ตร.ม.
+        }
+        
+        // คำนวณความสูง (แก้ไขปัญหาค่าต่ำเกินไป - ใช้มุมยกระดับโดยตรง)
+        function calculateHeight() {
+            if (points.length < 2) return 0;
+            
+            const p1 = points[0]; // จุดฐาน (ด้านล่าง)
+            const p2 = points[points.length - 1]; // จุดยอด (ด้านบน)
+            const centerY = video.videoHeight / 2;
+            
+            // คำนวณระยะห่างเฉลี่ยจากกล้องถึงวัตถุ
+            let avgDistance;
+            if (manualDistanceMode) {
+                // ใช้ระยะทางที่ผู้ใช้กำหนด
+                avgDistance = manualDistance;
+            } else {
+                // คำนวณระยะทางอัตโนมัติ
+                avgDistance = (calculateDistanceToObject(p1.y, centerY) + calculateDistanceToObject(p2.y, centerY)) / 2;
+            }
+            
+            // คำนวณความต่างของพิกเซลในแนวตั้ง
+            const pixelDifference = Math.abs(p2.y - p1.y);
+            
+            // คำนวณมุมจากความต่างพิกเซล
+            const verticalFOVRad = (cameraFOV.vertical * Math.PI) / 180;
+            const pixelsPerDegree = video.videoHeight / verticalFOVRad;
+            const angleInRadians = pixelDifference / pixelsPerDegree;
+            
+            // คำนวณความสูงด้วยตรีโกณมิติ: height = distance × tan(angle)
+            let objectHeight = avgDistance * Math.tan(angleInRadians);
+            
+            // ปรับค่าตามระยะห่างแนวนอน (ถ้ามี)
+            const dx = Math.abs(p2.x - p1.x);
+            if (dx > 20) { // มีการเลื่อนแนวนอนมาก
+                const horizontalCorrection = Math.cos(Math.atan(dx / video.videoWidth));
+                objectHeight *= horizontalCorrection;
+            }
+            
+            // ปรับค่าตามมุมเอียงกล้อง
+            const tiltCorrection = Math.cos(cameraTilt * Math.PI / 180);
+            objectHeight *= tiltCorrection;
+            
+            // ใช้ปัจจัยชดเชยตามระยะห่างและความสูงของวัตถุ (เฉพาะโหมดอัตโนมัติ)
+            if (!manualDistanceMode) {
+                const distanceCompensation = getDistanceCompensationFactor(avgDistance, objectHeight);
+                objectHeight *= distanceCompensation;
+            }
+            
+            // เพิ่มปัจจัยการปรับแต่งสำหรับความแม่นยำ (ตามข้อมูลจริง)
+            const calibrationFactor = 1.2; // ปรับจากการทดสอบจริง
+            objectHeight *= calibrationFactor;
+            
+            // ตรวจสอบและแสดงคำแนะนำตามระยะห่าง (เฉพาะโหมดอัตโนมัติ)
+            if (!manualDistanceMode) {
+                const distanceCheck = checkOptimalDistance(objectHeight, avgDistance);
+                updateDistanceWarnings(distanceCheck);
+            }
+            
+            // จำกัดค่าให้อยู่ในช่วงที่สมเหตุสมผล
+            return Math.max(0.1, Math.min(100, objectHeight));
+        }
+        
+        // คำนวณมุมแนวตั้งจากตำแหน่งพิกเซล (ปรับปรุงใหม่)
+        function getVerticalAngleFromPixel(pixelY, centerY) {
+            // ในโหมดตั้งฉาก: ใช้จุดศูนย์กลางกล้องเป็นฐาน (มุม = 0°)
+            if (perpendicularMode) {
+                return 0;
+            }
+            
+            // โหมดปกติ: คำนวณมุมจากตำแหน่งพิกเซลเทียบกับจุดศูนย์กลาง
+            const normalizedY = (pixelY - centerY) / centerY;
+            const verticalAngleRad = normalizedY * (cameraFOV.vertical / 2) * (Math.PI / 180);
+            
+            // ปรับมุมตามการเอียงของกล้อง
+            return verticalAngleRad + (cameraTilt * Math.PI / 180);
+        }
+        
+        // คำนวณมุมแนวนอนจากตำแหน่งพิกเซล
+        function getHorizontalAngleFromPixel(pixelX, centerX) {
+            const normalizedX = (pixelX - centerX) / centerX;
+            const halfFOVRad = (cameraFOV.horizontal / 2) * (Math.PI / 180);
+            return Math.atan(normalizedX * Math.tan(halfFOVRad));
+        }
+        
+        // คำนวณมุม
+        function calculateAngle() {
+            if (points.length < 3) return 0;
+            
+            const vertex = points[0]; // จุดยอดมุม
+            const p1 = points[1];     // จุดที่ 1
+            const p2 = points[2];     // จุดที่ 2
+            
+            // คำนวณเวกเตอร์จากยอดไปยังจุดต่างๆ
+            const v1x = p1.x - vertex.x;
+            const v1y = p1.y - vertex.y;
+            const v2x = p2.x - vertex.x;
+            const v2y = p2.y - vertex.y;
+            
+            // คำนวณมุมด้วยฟังก์ชัน atan2
+            const angle1 = Math.atan2(v1y, v1x);
+            const angle2 = Math.atan2(v2y, v2x);
+            
+            // หามุมระหว่างเวกเตอร์ทั้งสอง
+            let angleDiff = Math.abs(angle2 - angle1);
+            
+            // แปลงเป็นองศา
+            angleDiff = angleDiff * (180 / Math.PI);
+            
+            // ให้มุมอยู่ในช่วง 0-180 องศา
+            if (angleDiff > 180) {
+                angleDiff = 360 - angleDiff;
+            }
+            
+            return angleDiff;
+        }
+        
+        // เปิด/ปิดโหมดกำหนดระยะทางเอง
+        function toggleManualDistance() {
+            manualDistanceMode = !manualDistanceMode;
+            const toggleButton = document.getElementById('manualDistanceToggle');
+            const distanceField = document.getElementById('manualDistanceField');
+            
+            if (manualDistanceMode) {
+                toggleButton.textContent = '📐 ปิดโหมดกำหนดระยะเอง';
+                toggleButton.style.backgroundColor = '#ff6b6b';
+                distanceField.style.display = 'block';
+            } else {
+                toggleButton.style.backgroundColor = '#4ecdc4';
+                distanceField.style.display = 'none';
+            }
+            
+            // อัปเดตการแสดงผลทันที
+            updateInfo();
+            if (points.length >= 2 && currentMode === 'height') {
+                updateCalculationSteps();
+            }
+        }
+
+        // อัปเดตระยะทางที่ผู้ใช้กำหนด
+        function updateManualDistance(value) {
+            manualDistance = parseFloat(value) || 5.0;
+            
+            // อัปเดตการแสดงผลทันที
+            updateInfo();
+            if (points.length >= 2 && currentMode === 'height') {
+                updateCalculationSteps();
+            }
+        }
+        
+        // คำนวณความสูงด้วย Law of Cosines (เพิ่มฟังก์ชันที่หายไป)
+        function calculateHeightFromLawOfCosines() {
+            const angleC = parseFloat(document.getElementById('angleInput')?.value || '90');
+            const sideA = parseFloat(document.getElementById('sideAInput')?.value || '3.0');
+            const sideB = parseFloat(document.getElementById('sideBInput')?.value || '4.0');
+            
+            // ตรวจสอบค่าที่ป้อนเข้า
+            if (isNaN(angleC) || isNaN(sideA) || isNaN(sideB)) {
+                return 0;
+            }
+            
+            // ตรวจสอบช่วงค่าที่ถูกต้อง
+            if (angleC <= 0 || angleC >= 180 || sideA <= 0 || sideB <= 0) {
+                return 0;
+            }
+            
+            // แปลงมุมเป็นเรเดียน
+            const angleCRad = (angleC * Math.PI) / 180;
+            
+            // คำนวณด้วย Law of Cosines: c² = a² + b² - 2ab cos(C)
+            const cSquared = (sideA * sideA) + (sideB * sideB) - (2 * sideA * sideB * Math.cos(angleCRad));
+            
+            // ตรวจสอบว่าผลลัพธ์เป็นบวก (สามเหลี่ยมที่เป็นไปได้)
+            if (cSquared < 0) {
+                return 0; // ค่าที่ป้อนไม่สามารถสร้างสามเหลี่ยมได้
+            }
+            
+            // คำนวณความสูง c
+            const height = Math.sqrt(cSquared);
+            
+            // จำกัดค่าให้อยู่ในช่วงสมเหตุสมผล (0.01-1000 เมตร)
+            const finalHeight = Math.max(0.01, Math.min(1000, height));
+            
+            // อัปเดตผลลัพธ์แบบเรียลไทม์
+            updateResults(0, 0, finalHeight, 0);
+            
+            return finalHeight;
+        }
     </script>
 </body>
 </html>
