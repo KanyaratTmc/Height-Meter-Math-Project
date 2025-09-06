@@ -974,12 +974,12 @@
             <div class="formula-grid">
                 <div class="formula-item">
                     <div class="formula-title">ฟังก์ชัน Sine</div>
-                    <div class="formula-equation">sin θ = ตรงข้าม / ด้านเอียง</div>
+                    <div class="formula-equation">sin θ = ตรงข้าม / ตรงข้ามฉาก</div>
                     <div class="formula-desc">ใช้หาความสูงจากมุมและระยะ</div>
                 </div>
                 <div class="formula-item">
                     <div class="formula-title">ฟังก์ชัน Cosine</div>
-                    <div class="formula-equation">cos θ = ประชิด / ด้านเอียง</div>
+                    <div class="formula-equation">cos θ = ประชิด / ตรงข้ามฉาก</div>
                     <div class="formula-desc">ใช้หาระยะแนวนอนจากมุม</div>
                 </div>
                 <div class="formula-item">
@@ -1081,7 +1081,7 @@
         <div class="instructions">
             <h3>วิธีใช้งาน:</h3>
             <ul id="instructionsList">
-                <li><strong>โหมดระยะทาง:</strong> เลือกจุดเริ่มต้นและจุดสิ้นสุด กดปุ่ม "เพิ่มจุด" ที่จุดทั้งสอง แล้วกด "คำนวณ"</li>
+                <li><strong>โหมดความยาว:</strong> เลือกจุดเริ่มต้นและจุดสิ้นสุด กดปุ่ม "เพิ่มจุด" ที่จุดทั้งสอง แล้วกด "คำนวณ"</li>
                 <li><strong>โหมดพื้นที่:</strong> เพิ่มจุดรอบๆ พื้นที่ที่ต้องการวัด (อย่างน้อย 3 จุด) แล้วกด "คำนวณ"</li>
                 <li><strong>โหมดความสูง:</strong> กรอกค่ามุม C และความยาวด้าน a, b ในเครื่องคิดเลข Law of Cosines แล้วกด "คำนวณ"</li>
                 <li><strong>โหมดมุม:</strong> เลือก 3 จุด (จุดแรกเป็นจุดยอดของมุม) แล้วกด "คำนวณ"</li>
@@ -1098,7 +1098,7 @@
 
         <div class="results">
             <div class="result-item">
-                <span class="result-label">ระยะทาง:</span>
+                <span class="result-label">ความยาว:</span>
                 <span class="result-value" id="distance">0 ม.</span>
             </div>
             <div class="result-item">
@@ -1137,8 +1137,8 @@
         let cameraHeight = 1.5; // ความสูงกล้องจากพื้น (เมตร)
         let cameraTilt = 0; // มุมเอียงกล้อง (องศา)
         let deviceOrientation = { alpha: 0, beta: 0, gamma: 0 }; // การหมุนอุปกรณ์
-        let manualDistanceMode = false; // โหมดกำหนดระยะทางเอง
-        let manualDistance = 5.0; // ระยะทางที่ผู้ใช้กำหนดเอง (เมตร)
+        let manualDistanceMode = false; // โหมดกำหนดความยาวเอง
+        let manualDistance = 5.0; // ความยาวที่ผู้ใช้กำหนดเอง (เมตร)
         
         // ข้อมูลอุปกรณ์สำหรับการปรับ FOV
         let deviceInfo = {
@@ -1515,7 +1515,7 @@
                     // หาปุ่มที่ตรงกับโหมดและเปิดใช้งาน
                     modeButtons.forEach(button => {
                         const buttonText = button.textContent.toLowerCase();
-                        if ((mode === 'distance' && buttonText.includes('ระยะทาง')) ||
+                        if ((mode === 'distance' && buttonText.includes('ความยาว')) ||
                             (mode === 'area' && buttonText.includes('พื้นที่')) ||
                             (mode === 'height' && buttonText.includes('ความสูง')) ||
                             (mode === 'angle' && buttonText.includes('มุม'))) {
@@ -1621,7 +1621,7 @@
                 return;
             }
             if (currentMode === 'distance' && points.length >= 2) {
-                alert('โหมดระยะทางใช้ตัวอย่าง 2 จุด (เริ่มต้น-สิ้นสุด)');
+                alert('โหมดความยาวใช้ตัวอย่าง 2 จุด (เริ่มต้น-สิ้นสุด)');
                 return;
             }
             if (currentMode === 'angle' && points.length >= 3) {
@@ -1686,7 +1686,7 @@
                 const dx = p2.x - p1.x;
                 const dy = p2.y - p1.y;
                 
-                // คำนวณระยะทางในระนาบ 2D
+                // คำนวณความยาวในระนาบ 2D
                 const pixelDistance = Math.sqrt(dx * dx + dy * dy);
                 
                 // Advanced Perspective Correction
@@ -1716,7 +1716,7 @@
                 const dx = p2.x - p1.x;
                 const dy = p2.y - p1.y;
                 
-                // คำนวณระยะทางในระนาบ 2D
+                // คำนวณความยาวในระนาบ 2D
                 const pixelDistance = Math.sqrt(dx * dx + dy * dy);
                 
                 // Advanced Perspective Correction
@@ -1795,7 +1795,7 @@
             updateResults(distance, area, height, angle);
         }
         
-        // คำนวณระยะทาง
+        // คำนวณความยาว
         function getScalePxPerMeter() {
             const v = parseFloat(document.getElementById('scaleInput')?.value || '100');
             return isNaN(v) || v <= 0 ? 100 : v;
@@ -1812,7 +1812,7 @@
                 const dx = p2.x - p1.x;
                 const dy = p2.y - p1.y;
                 
-                // คำนวณระยะทางในระนาบ 2D
+                // คำนวณความยาวในระนาบ 2D
                 const pixelDistance = Math.sqrt(dx * dx + dy * dy);
                 
                 // Advanced Perspective Correction
@@ -1905,10 +1905,10 @@
             // คำนวณระยะห่างเฉลี่ยจากกล้องถึงวัตถุ
             let avgDistance;
             if (manualDistanceMode) {
-                // ใช้ระยะทางที่ผู้ใช้กำหนด
+                // ใช้ความยาวที่ผู้ใช้กำหนด
                 avgDistance = manualDistance;
             } else {
-                // คำนวณระยะทางอัตโนมัติ
+                // คำนวณความยาวอัตโนมัติ
                 avgDistance = (calculateDistanceToObject(p1.y, centerY) + calculateDistanceToObject(p2.y, centerY)) / 2;
             }
             
@@ -2045,7 +2045,7 @@
                         
                         stepsHTML = `
                             <div class="step-item">
-                                <span class="step-number">ขั้นที่ 1:</span> หาระยะทางในระนาบ 2D
+                                <span class="step-number">ขั้นที่ 1:</span> หาความยาวในระนาบ 2D
                                 <div class="step-formula">Δx = ${dx} px, Δy = ${dy} px</div>
                                 <div class="step-formula">d₂D = √(Δx² + Δy²) = ${pixelDistance.toFixed(2)} px</div>
                             </div>
@@ -2057,9 +2057,9 @@
                                 <div class="step-formula">แก้ไขมุมเอียง = ${tiltCorrection.toFixed(3)} (${cameraTilt.toFixed(1)}°)</div>
                             </div>
                             <div class="step-item">
-                                <span class="step-number">ขั้นที่ 3:</span> คำนวณระยะทางจริง
+                                <span class="step-number">ขั้นที่ 3:</span> คำนวณความยาวจริง
                                 <div class="step-formula">การปรับแต่งรวม = ${(curvatureFactor * tiltCorrection * distanceScaling).toFixed(3)}</div>
-                                <div class="step-formula">ระยะทางจริง = (${pixelDistance.toFixed(2)} × ${(curvatureFactor * tiltCorrection * distanceScaling).toFixed(3)}) ÷ ${s} = ${result.toFixed(3)} ม.</div>
+                                <div class="step-formula">ความยาวจริง = (${pixelDistance.toFixed(2)} × ${(curvatureFactor * tiltCorrection * distanceScaling).toFixed(3)}) ÷ ${s} = ${result.toFixed(3)} ม.</div>
                             </div>
                         `;
                     }
@@ -2675,10 +2675,10 @@
             // คำนวณระยะห่างเฉลี่ยจากกล้องถึงวัตถุ
             let avgDistance;
             if (manualDistanceMode) {
-                // ใช้ระยะทางที่ผู้ใช้กำหนด
+                // ใช้ความยาวที่ผู้ใช้กำหนด
                 avgDistance = manualDistance;
             } else {
-                // คำนวณระยะทางอัตโนมัติ
+                // คำนวณความยาวอัตโนมัติ
                 avgDistance = (calculateDistanceToObject(p1.y, centerY) + calculateDistanceToObject(p2.y, centerY)) / 2;
             }
             
@@ -2778,7 +2778,7 @@
             return angleDiff;
         }
         
-        // เปิด/ปิดโหมดกำหนดระยะทางเอง
+        // เปิด/ปิดโหมดกำหนดความยาวเอง
         function toggleManualDistance() {
             manualDistanceMode = !manualDistanceMode;
             const toggleButton = document.getElementById('manualDistanceToggle');
@@ -2800,7 +2800,7 @@
             }
         }
 
-        // อัปเดตระยะทางที่ผู้ใช้กำหนด
+        // อัปเดตความยาวที่ผู้ใช้กำหนด
         function updateManualDistance(value) {
             manualDistance = parseFloat(value) || 5.0;
             
